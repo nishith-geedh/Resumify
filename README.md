@@ -1,5 +1,5 @@
 # Resumify – AI-Powered Resume Analysis & Job Matching Platform
-[![AWS Lambda](https://img.shields.io/badge/AWS%20Lambda-Serverless-orange?logo=awslambda)](https://aws.amazon.com/lambda/) [![Amazon DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-blue?logo=amazon-dynamodb)](https://aws.amazon.com/dynamodb/) [![AWS Textract](https://img.shields.io/badge/AWS%20Textract-OCR-green?logo=amazon-aws)](https://aws.amazon.com/textract/) [![Amazon Comprehend](https://img.shields.io/badge/Amazon%20Comprehend-NLP-FF9900?logo=amazon-aws)](https://aws.amazon.com/comprehend/) [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)](https://www.python.org/) [![GitHub repo size](https://img.shields.io/github/repo-size/yourusername/Resumify?color=6aa64d&cacheSeconds=3600)](https://github.com/yourusername/Resumify) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/yourusername/Resumify?logo=github)](https://github.com/yourusername/Resumify/commits/main)
+[![AWS Lambda](https://img.shields.io/badge/AWS%20Lambda-Serverless-orange?logo=awslambda)](https://aws.amazon.com/lambda/) [![Amazon DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-blue?logo=amazon-dynamodb)](https://aws.amazon.com/dynamodb/) [![AWS Textract](https://img.shields.io/badge/AWS%20Textract-OCR-green?logo=amazon-aws)](https://aws.amazon.com/textract/) [![Amazon Comprehend](https://img.shields.io/badge/Amazon%20Comprehend-NLP-FF9900?logo=amazon-aws)](https://aws.amazon.com/comprehend/) [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)](https://www.python.org/) [![GitHub repo size](https://img.shields.io/github/repo-size/nishith-geedh/Resumify?color=6aa64d&cacheSeconds=3600)](https://github.com/nishith-geedh/Resumify) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/nishith-geedh/Resumify?logo=github)](https://github.com/nishith-geedh/Resumify/commits/main)
 
 ---
 
@@ -277,7 +277,7 @@ Resumify/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Resumify.git
+   git clone https://github.com/nishith-geedh/Resumify.git
    cd Resumify
    ```
 
@@ -935,7 +935,7 @@ We welcome contributions from the community! Please follow these guidelines:
 
 1. **Fork the repository**
    ```bash
-   git clone https://github.com/yourusername/Resumify.git
+   git clone https://github.com/nishith-geedh/Resumify.git
    cd Resumify
    ```
 
