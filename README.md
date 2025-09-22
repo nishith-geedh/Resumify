@@ -333,7 +333,6 @@ Resumify/
    - **Development**: [http://localhost:3000](http://localhost:3000)
    - **Production**: Your deployed frontend URL
 
-![Landing Page](./demo/landing%20page.png)
 
 ### 🌐 Production Deployment
 
