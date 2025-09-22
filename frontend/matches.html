@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches - Resumify</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- Navigation and dropdown styles -->
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/dropdown-fixes.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cream': '#FFF2C6',
+                        'yellow': '#FFD646',
+                        'mint': '#00D7AB',
+                        'purple-light': '#DAA5FF',
+                        'purple-dark': '#6628AD',
+                        'blue': '#4EC4FE',
+                        'red': '#F24E32',
+                        'dark': '#191919'
+                    },
+                    fontFamily: {
+                        'sora': ['Sora', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { 
+            font-family: 'Montserrat', sans-serif;
+        }
+        .heading-font {
+            font-family: 'Sora', sans-serif;
+        }
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Navigation active state */
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link.active {
+            color: rgb(255, 242, 198) !important; /* cream */
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, rgb(78, 196, 254), rgb(0, 215, 171)); /* blue, mint */
+            border-radius: 1px;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.5); /* blue with opacity */
+        }
+        .glow-box {
+            box-shadow: 0 0 30px rgba(78, 196, 254, 0.3); /* blue with opacity */
+        }
+        .gradient-border {
+            background: linear-gradient(45deg, rgb(78, 196, 254), rgb(218, 165, 255), rgb(0, 215, 171)); /* blue, purple-light, mint */
+            padding: 2px;
+            border-radius: 16px;
+        }
+        .gradient-border-inner {
+            background: rgb(25, 25, 25); /* dark */
+            border-radius: 14px;
+        }
+        
+        /* Match Card Improvements */
+        .match-card {
+            transition: all 0.3s ease;
+            background: rgba(25, 25, 25, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 242, 198, 0.2);
+        }
+        
+        .match-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 215, 171, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 215, 171, 0.1);
+        }
+        
+        .match-card:hover .card-text {
+            color: rgb(255, 242, 198) !important; /* cream */
+        }
+        
+        .match-card .card-text {
+            transition: color 0.3s ease;
+            color: rgba(255, 242, 198, 0.9) !important; /* cream with opacity */
+        }
+        
+        /* Progress Circle Improvements */
+        .progress-circle {
+            transition: all 0.3s ease;
+        }
+        
+        .match-card:hover .progress-circle {
+            transform: scale(1.05);
+        }
+        
+        /* Button Improvements */
+        .gradient-button {
+            background: linear-gradient(45deg, rgb(78, 196, 254), rgb(0, 215, 171));
+            color: rgb(25, 25, 25);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gradient-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 196, 254, 0.3);
+        }
+        
+        .gradient-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .gradient-button:hover::before {
+            left: 100%;
+        }
+        
+        .secondary-button {
+            background: rgba(218, 165, 255, 0.1);
+            border: 1px solid rgba(218, 165, 255, 0.3);
+            color: rgb(218, 165, 255);
+            transition: all 0.3s ease;
+        }
+        
+        .secondary-button:hover {
+            background: rgba(218, 165, 255, 0.2);
+            border-color: rgba(218, 165, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(218, 165, 255, 0.2);
+        }
+        
+        .accent-button {
+            background: rgba(0, 215, 171, 0.1);
+            border: 1px solid rgba(0, 215, 171, 0.3);
+            color: rgb(0, 215, 171);
+            transition: all 0.3s ease;
+        }
+        
+        .accent-button:hover {
+            background: rgba(0, 215, 171, 0.2);
+            border-color: rgba(0, 215, 171, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 215, 171, 0.2);
+        }
+        
+        /* Skill Tag Improvements */
+        .skill-tag {
+            transition: all 0.3s ease;
+        }
+        
+        .skill-tag:hover {
+            transform: scale(1.05);
+        }
+        
+        .skill-tag.matching {
+            background: rgba(0, 215, 171, 0.2);
+            color: rgb(0, 215, 171);
+            border: 1px solid rgba(0, 215, 171, 0.3);
+        }
+        
+        .skill-tag.missing {
+            background: rgba(242, 78, 50, 0.2);
+            color: rgb(242, 78, 50);
+            border: 1px solid rgba(242, 78, 50, 0.3);
+        }
+        
+        /* Control Panel Improvements */
+        .control-panel {
+            background: rgba(25, 25, 25, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 242, 198, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .control-panel:hover {
+            border-color: rgba(255, 242, 198, 0.3);
+        }
+        
+        /* Logo link styles */
+        .logo-link {
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-link:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-link:hover h1 {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-dark text-cream">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-96 h-96 bg-purple-light/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-20 left-1/3 w-80 h-80 bg-mint/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="nav-content">
+                <div class="flex items-center">
+                    <a href="/" class="logo-link" aria-label="Resumify Home">
+                        <div>
+                            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent heading-font">
+                                Resumify
+                            </h1>
+                            <p class="text-sm text-purple-light/70 font-montserrat">AI-Powered Matching</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="desktop-nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="mobile-nav hidden">
+                <div class="mobile-nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4 heading-font">Job Matches</h1>
+            <p class="text-cream/80 text-lg font-montserrat">AI-powered matching between candidates and job openings</p>
+        </div>
+
+        <!-- Match Controls -->
+        <div class="control-panel rounded-2xl p-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                <!-- Candidate Selection -->
+                <div class="lg:col-span-4">
+                    <label class="block text-sm font-medium text-cream mb-2 font-montserrat">Select Candidate</label>
+                    <select id="candidateSelect" class="dropdown-select w-full px-4 py-3 bg-dark/50 border border-cream/30 rounded-xl text-cream focus:outline-none focus:ring-2 focus:ring-mint/50 font-montserrat transition-all">
+                        <option value="">Choose a candidate...</option>
+                    </select>
+                </div>
+                
+                <!-- Job Selection -->
+                <div class="lg:col-span-4">
+                    <label class="block text-sm font-medium text-cream mb-2 font-montserrat">Select Job (Optional)</label>
+                    <select id="jobSelect" class="dropdown-select w-full px-4 py-3 bg-dark/50 border border-cream/30 rounded-xl text-cream focus:outline-none focus:ring-2 focus:ring-mint/50 font-montserrat transition-all">
+                        <option value="">All jobs</option>
+                    </select>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="lg:col-span-4 flex flex-col sm:flex-row gap-2">
+                    <button onclick="findMatches()" class="gradient-button flex-1 px-4 py-3 rounded-xl font-montserrat text-sm">
+                        <i data-lucide="search" class="w-4 h-4 inline mr-2"></i>
+                        Find Matches
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center py-12">
+            <div class="relative mx-auto mb-6" style="width: fit-content;">
+                <div class="w-20 h-20 border-4 border-cream/20 border-t-mint rounded-full animate-spin"></div>
+                <div class="absolute inset-0 w-20 h-20 border-4 border-transparent border-r-blue rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            </div>
+            <h3 class="text-2xl font-semibold text-cream mb-3 heading-font">Finding Matches...</h3>
+            <p class="text-cream/70 font-montserrat mb-4">AI is analyzing skills and requirements</p>
+            <div class="flex items-center justify-center gap-2 text-sm text-cream/50 font-montserrat">
+                <div class="w-2 h-2 bg-mint rounded-full animate-pulse"></div>
+                <div class="w-2 h-2 bg-blue rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                <div class="w-2 h-2 bg-yellow rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+            </div>
+        </div>
+
+        <!-- Matches Results -->
+        <div id="matchesResults" class="hidden space-y-6">
+            <!-- Match cards will be inserted here -->
+        </div>
+
+        <!-- No Matches State -->
+        <div id="noMatchesState" class="hidden text-center py-12">
+            <div class="gradient-border mx-auto mb-6" style="width: fit-content;">
+                <div class="gradient-border-inner w-20 h-20 rounded-full flex items-center justify-center">
+                    <i data-lucide="search-x" class="w-8 h-8 text-cream/50"></i>
+                </div>
+            </div>
+            <h3 class="text-2xl font-semibold text-cream mb-3 heading-font">No Matches Found</h3>
+            <p class="text-cream/70 mb-6 font-montserrat max-w-md mx-auto">No suitable job matches were found for the selected candidate</p>
+            <div class="space-y-3 text-sm text-cream/60 font-montserrat max-w-lg mx-auto">
+                <p>This could happen if:</p>
+                <ul class="text-left space-y-2">
+                    <li class="flex items-start gap-2">
+                        <div class="w-1.5 h-1.5 bg-cream/40 rounded-full mt-2 flex-shrink-0"></div>
+                        <span>The candidate hasn't been analyzed yet</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <div class="w-1.5 h-1.5 bg-cream/40 rounded-full mt-2 flex-shrink-0"></div>
+                        <span>No jobs match the candidate's skills and experience</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <div class="w-1.5 h-1.5 bg-cream/40 rounded-full mt-2 flex-shrink-0"></div>
+                        <span>There are no job postings available</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+                <button onclick="window.location.href='/jobs.html'" class="secondary-button px-6 py-2 rounded-xl font-montserrat text-sm">
+                    <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+                    Add Jobs
+                </button>
+                <button onclick="showInitialState()" class="accent-button px-6 py-2 rounded-xl font-montserrat text-sm">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2"></i>
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Initial State -->
+        <div id="initialState" class="text-center py-12">
+            <div class="gradient-border mx-auto mb-6" style="width: fit-content;">
+                <div class="gradient-border-inner w-20 h-20 rounded-full flex items-center justify-center">
+                    <i data-lucide="zap" class="w-8 h-8 text-mint"></i>
+                </div>
+            </div>
+            <h3 class="text-2xl font-semibold text-cream mb-3 heading-font">Ready to Find Matches</h3>
+            <p class="text-cream/70 mb-8 font-montserrat max-w-md mx-auto">Select a candidate above to discover their perfect job matches using AI-powered analysis</p>
+            <div class="flex items-center justify-center gap-4 text-sm text-cream/60 font-montserrat">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-mint rounded-full"></div>
+                    <span>Skills Analysis</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-blue rounded-full"></div>
+                    <span>Experience Matching</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-yellow rounded-full"></div>
+                    <span>AI Scoring</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/api-status.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/error-notifications.js"></script>
+    <!-- <script src="js/dropdown-enhancements.js"></script> -->
+    <script src="js/realtime-data-updates.js"></script>
+    <script>
+        let candidates = [];
+        let jobs = [];
+        let currentMatches = [];
+        let currentCandidateId = null;
+        let isInitialLoad = true;
+
+        // Initialize page
+        async function initializePage() {
+            try {
+                // Load candidates and jobs first
+                await Promise.all([loadCandidates(), loadJobs()]);
+                
+                // Start real-time updates for candidates and jobs
+                startRealTimeUpdates();
+                
+                // Check URL parameters for candidate pre-selection
+                const urlParams = new URLSearchParams(window.location.search);
+                const candidateId = urlParams.get('candidateId');
+                const jobId = urlParams.get('jobId');
+                
+                // Handle candidate pre-selection - ensure candidates is properly initialized
+                if (candidateId && Array.isArray(candidates) && candidates.length > 0) {
+                    // Verify candidate exists in loaded data
+                    const candidateExists = candidates.find(c => c.candidateId === candidateId);
+                    
+                    if (candidateExists) {
+                        // Pre-select the candidate in dropdown
+                        const candidateSelect = document.getElementById('candidateSelect');
+                        candidateSelect.value = candidateId;
+                        currentCandidateId = candidateId;
+                        
+                        // Verify the selection was successful
+                        if (candidateSelect.value === candidateId) {
+                            // Show loading state immediately
+                            showLoadingState();
+                            
+                            // Automatically trigger match search
+                            setTimeout(async () => {
+                                try {
+                                    await findMatches();
+                                    showAlert(`Showing matches for ${candidateExists.name || 'selected candidate'}`, 'success');
+                                } catch (error) {
+                                    console.error('Auto-match failed:', error);
+                                    showAlert('Failed to automatically find matches. Please try manually.', 'warning');
+                                    showInitialState();
+                                }
+                            }, 500); // Small delay to ensure UI updates
+                        } else {
+                            console.warn('Failed to select candidate in dropdown');
+                            showAlert('Failed to select candidate. Please try selecting manually.', 'warning');
+                            showInitialState();
+                        }
+                    } else {
+                        // Candidate not found - show error message
+                        showAlert('Candidate not found. Please select a candidate from the dropdown.', 'warning');
+                        showInitialState();
+                    }
+                }
+                
+                // Handle job pre-selection
+                if (jobId) {
+                    const jobExists = jobs.find(j => j.jobId === jobId);
+                    if (jobExists) {
+                        document.getElementById('jobSelect').value = jobId;
+                    }
+                }
+                
+                // If no candidate pre-selected, show initial state
+                if (!candidateId) {
+                    showInitialState();
+                }
+                
+                isInitialLoad = false;
+                
+            } catch (error) {
+                console.error('Failed to initialize page:', error);
+                showAlert('Failed to load page data. Please refresh and try again.', 'error');
+                showInitialState();
+            }
+        }
+
+        // Handle real-time candidates updates
+        function handleCandidatesUpdate(newCandidates, changeInfo) {
+            const previousCandidateId = currentCandidateId; // Preserve current selection
+            candidates = Array.isArray(newCandidates) ? newCandidates : [];
+            populateCandidateSelect();
+            
+            // Restore previous selection if it still exists
+            if (previousCandidateId && candidates.find(c => c.candidateId === previousCandidateId)) {
+                const candidateSelect = document.getElementById('candidateSelect');
+                candidateSelect.value = previousCandidateId;
+                currentCandidateId = previousCandidateId;
+            }
+            
+            // Show notification for changes (but not on initial load)
+            if (!isInitialLoad && changeInfo.changeType !== 'none') {
+                window.realtimeDataUpdates.showChangeNotification('candidates', changeInfo);
+            }
+        }
+
+        // Handle real-time jobs updates
+        function handleJobsUpdate(newJobs, changeInfo) {
+            jobs = newJobs;
+            populateJobSelect();
+            
+            // Show notification for changes (but not on initial load)
+            if (!isInitialLoad && changeInfo.changeType !== 'none') {
+                window.realtimeDataUpdates.showChangeNotification('jobs', changeInfo);
+                
+                // If we have an active candidate, refresh matches to include new jobs
+                if (currentCandidateId && changeInfo.changeType === 'added') {
+                    setTimeout(() => {
+                        findMatches();
+                    }, 2000); // Small delay to allow backend processing
+                }
+            }
+        }
+
+        // Handle real-time matches updates
+        async function handleMatchesUpdate(newMatches, changeInfo) {
+            if (changeInfo.candidateId === currentCandidateId) {
+                currentMatches = newMatches;
+                
+                // Get candidate data for display - try to get analysis data first
+                let candidateData = candidates.find(c => c.candidateId === currentCandidateId) || 
+                                   { name: 'Unknown', candidateId: currentCandidateId };
+                
+                // Try to get analysis data for better candidate information
+                try {
+                    const analysisResponse = await window.resumifyAPI.getAnalysis(currentCandidateId);
+                    if (analysisResponse.success && analysisResponse.data) {
+                        const analysis = analysisResponse.data;
+                        candidateData = {
+                            ...candidateData,
+                            ...analysis,
+                            // Extract skills from analysis
+                            skills: analysis.skills || [],
+                            // Extract experience from analysis
+                            experience: analysis.experience || [],
+                            // Use analysis status
+                            status: analysis.status || candidateData.status
+                        };
+                    }
+                } catch (error) {
+                    console.warn('Could not fetch analysis data for candidate display:', error);
+                }
+                
+                displayMatches(newMatches, candidateData);
+                
+                // Show notification for changes (but not on initial load)
+                if (!isInitialLoad && changeInfo.changeType !== 'none') {
+                    showAlert(`Matches updated: ${changeInfo.changeCount} ${changeInfo.changeType}`, 'success');
+                }
+            }
+        }
+
+        // Handle real-time update errors
+        function handleUpdateError(error) {
+            console.error('Real-time update error:', error);
+        }
+
+        // Load candidates
+        async function loadCandidates() {
+            try {
+                const response = await window.resumifyAPI.getCandidates();
+                
+                // Handle different response formats (same as candidates.html)
+                let candidatesData = [];
+                
+                if (response && response.candidates && Array.isArray(response.candidates)) {
+                    // Direct API response format: {candidates: [...]}
+                    candidatesData = response.candidates;
+                } else if (response && response.success && response.data) {
+                    if (Array.isArray(response.data)) {
+                        candidatesData = response.data;
+                    } else if (response.data.data && Array.isArray(response.data.data)) {
+                        // API response format: {success: true, data: {data: [...], count: N}}
+                        candidatesData = response.data.data;
+                    } else if (response.data.Items && Array.isArray(response.data.Items)) {
+                        // DynamoDB scan response format
+                        candidatesData = response.data.Items;
+                    } else {
+                        console.warn('Unexpected candidates response format:', response.data);
+                        candidatesData = [];
+                    }
+                } else if (response && Array.isArray(response)) {
+                    candidatesData = response;
+                } else {
+                    candidatesData = [];
+                }
+                
+                candidates = candidatesData;
+                populateCandidateSelect();
+                
+            } catch (error) {
+                console.error('Failed to load candidates:', error);
+                candidates = []; // Initialize as empty array
+                showErrorState('candidates', error.message);
+            }
+        }
+
+        // Load jobs
+        async function loadJobs() {
+            try {
+                const response = await window.resumifyAPI.getJobs();
+                console.log('📋 Jobs API response:', response);
+                
+                // Handle the actual API response format: {jobs: [...], count: N}
+                let jobsData = [];
+                
+                if (response && response.jobs && Array.isArray(response.jobs)) {
+                    // Direct API response format: {jobs: [...], count: N}
+                    jobsData = response.jobs;
+                } else if (response && response.success && response.data) {
+                    if (Array.isArray(response.data)) {
+                        jobsData = response.data;
+                    } else if (response.data.data && Array.isArray(response.data.data)) {
+                        // API response format: {success: true, data: {data: [...], count: N}}
+                        jobsData = response.data.data;
+                    } else {
+                        console.warn('Unexpected jobs response format:', response.data);
+                        jobsData = [];
+                    }
+                } else if (response && Array.isArray(response)) {
+                    jobsData = response;
+                } else {
+                    jobsData = [];
+                }
+                
+                jobs = jobsData;
+                console.log('📋 Jobs loaded successfully:', { 
+                    count: jobs.length, 
+                    jobs: jobs.map(j => ({ id: j.jobId, title: j.title, company: j.company }))
+                });
+                populateJobSelect();
+                
+            } catch (error) {
+                console.error('Failed to load jobs:', error);
+                jobs = []; // Initialize as empty array
+                showErrorState('jobs', error.message);
+            }
+        }
+
+        // Populate candidate select
+        function populateCandidateSelect() {
+            const select = document.getElementById('candidateSelect');
+            select.innerHTML = '<option value="">Choose a candidate...</option>';
+            
+            if (candidates && candidates.length > 0) {
+                candidates.forEach(candidate => {
+                    const option = document.createElement('option');
+                    option.value = candidate.candidateId;
+                    const name = candidate.name || 'Unknown';
+                    const email = candidate.email || 'No email';
+                    option.textContent = `${name} (${email})`;
+                    select.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No candidates available';
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        }
+
+        // Populate job select
+        function populateJobSelect() {
+            const select = document.getElementById('jobSelect');
+            select.innerHTML = '<option value="">All jobs</option>';
+            
+            console.log('🔧 Populating job select with:', jobs?.length || 0, 'jobs');
+            
+            if (jobs && jobs.length > 0) {
+                jobs.forEach(job => {
+                    const option = document.createElement('option');
+                    option.value = job.jobId;
+                    const title = job.title || 'Unknown Position';
+                    const company = job.company || 'Unknown Company';
+                    option.textContent = `${title} at ${company}`;
+                    select.appendChild(option);
+                    console.log('➕ Added job option:', { id: job.jobId, text: option.textContent });
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No jobs available';
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        }
+
+        // Show empty state for dropdowns
+        function showEmptyState(type) {
+            console.warn(`No ${type} available for matching`);
+        }
+
+        // Show error state for dropdowns
+        function showErrorState(type, error) {
+            console.error(`Error loading ${type}:`, error);
+        }
+
+        // Find matches with real-time updates integration
+        async function findMatches() {
+            const candidateId = document.getElementById('candidateSelect').value;
+            const jobId = document.getElementById('jobSelect').value;
+            
+            console.log('🔍 Finding matches for:', { candidateId, jobId, totalJobs: jobs?.length });
+            
+            if (!candidateId) {
+                showAlert('Please select a candidate first', 'warning');
+                showInitialState();
+                return;
+            }
+
+            if (!jobs || jobs.length === 0) {
+                showAlert('No jobs available for matching. Please add some jobs first.', 'info');
+                showNoMatchesState();
+                return;
+            }
+
+            // Get candidate info for better error messages
+            const candidateInfo = candidates.find(c => c.candidateId === candidateId);
+            const candidateName = candidateInfo ? (candidateInfo.name || candidateInfo.candidateName || 'Unknown') : 'Unknown';
+
+            // Update current candidate ID and start matches monitoring
+            if (currentCandidateId !== candidateId) {
+                // Stop previous matches monitoring
+                if (currentCandidateId) {
+                    stopMatchesUpdates(currentCandidateId);
+                }
+                
+                currentCandidateId = candidateId;
+                
+                // Start new matches monitoring
+                startMatchesUpdates(candidateId);
+            }
+
+            showLoadingState();
+
+            try {
+                // Use the matches API endpoint for better performance
+                const matchesResponse = await window.resumifyAPI.getMatches(candidateId, 10);
+                
+                // Handle different response formats
+                let matchesData = [];
+                if (matchesResponse && matchesResponse.matches && Array.isArray(matchesResponse.matches)) {
+                    // Direct API response format: {matches: [...], count: N}
+                    matchesData = matchesResponse.matches;
+                } else if (matchesResponse && matchesResponse.success && matchesResponse.data && Array.isArray(matchesResponse.data)) {
+                    // API response format: {success: true, data: [...]}
+                    matchesData = matchesResponse.data;
+                } else if (matchesResponse && Array.isArray(matchesResponse)) {
+                    // Direct array response
+                    matchesData = matchesResponse;
+                }
+                
+                if (matchesData && matchesData.length > 0) {
+                    // Apply job filter if specific job is selected
+                    if (jobId) {
+                        console.log('🎯 Filtering matches for specific job:', jobId);
+                        matchesData = matchesData.filter(match => {
+                            const job = match.job || match; // Handle different response formats
+                            return job.jobId === jobId;
+                        });
+                        console.log('🎯 Filtered matches count:', matchesData.length);
+                    }
+                    
+                    currentMatches = matchesData;
+                    
+                    // Get candidate data for display
+                    const analysisResponse = await window.resumifyAPI.getAnalysis(candidateId);
+                    let candidateData = analysisResponse.success ? analysisResponse.data : { 
+                        name: candidateName, 
+                        candidateId: candidateId,
+                        email: candidateInfo?.email || 'Unknown'
+                    };
+                    
+                    // Enhance candidate data with analysis information
+                    if (analysisResponse.success && analysisResponse.data) {
+                        const analysis = analysisResponse.data;
+                        candidateData = {
+                            ...candidateData,
+                            ...analysis,
+                            // Extract skills from analysis
+                            skills: analysis.skills || [],
+                            // Extract experience from analysis
+                            experience: analysis.experience || [],
+                            // Use analysis status
+                            status: analysis.status || candidateData.status
+                        };
+                    }
+                    
+                    displayMatches(currentMatches, candidateData);
+                } else if (matchesResponse.success && matchesResponse.data && matchesResponse.data.length === 0) {
+                    // API succeeded but no matches found
+                    showNoMatchesState();
+                    showAlert(`No job matches found for ${candidateName}. Try adjusting the job criteria or check if the candidate has been analyzed.`, 'info');
+                } else {
+                    throw new Error(matchesResponse.error || 'Failed to get matches from API');
+                }
+
+            } catch (error) {
+                console.error('Failed to find matches:', error);
+                
+                // Fallback to client-side matching if API fails
+                try {
+                    await findMatchesClientSide(candidateId, jobId);
+                } catch (fallbackError) {
+                    console.error('Fallback matching also failed:', fallbackError);
+                    showNoMatchesState();
+                    showAlert(`Failed to find matches for ${candidateName}. This could be because the candidate hasn't been analyzed yet or there are no suitable job matches.`, 'error');
+                }
+            }
+        }
+
+        // Client-side matching fallback
+        async function findMatchesClientSide(candidateId, jobId) {
+            console.log('🔄 Using client-side matching', { candidateId, jobId });
+            
+            const candidateInfo = candidates.find(c => c.candidateId === candidateId);
+            const candidateName = candidateInfo ? (candidateInfo.name || candidateInfo.candidateName || 'Unknown') : 'Unknown';
+            
+            console.log('👤 Candidate found:', candidateName);
+            
+            try {
+                // Get candidate analysis
+                const analysisResponse = await window.resumifyAPI.getAnalysis(candidateId);
+                if (!analysisResponse.success || !analysisResponse.data) {
+                    throw new Error(`No analysis data found for ${candidateName}. The candidate may not have been processed yet.`);
+                }
+
+                let candidateData = analysisResponse.data;
+                
+                // Enhance candidate data with analysis information
+                candidateData = {
+                    ...candidateData,
+                    // Extract skills from analysis
+                    skills: candidateData.skills || [],
+                    // Extract experience from analysis
+                    experience: candidateData.experience || [],
+                    // Use analysis status
+                    status: candidateData.status || 'processed'
+                };
+                
+                // Calculate matches with all jobs (or specific job)
+                const jobsToMatch = jobId ? jobs.filter(job => job.jobId === jobId) : jobs;
+                
+                console.log('🎯 Job filtering:', { 
+                    selectedJobId: jobId, 
+                    totalJobs: jobs.length, 
+                    filteredJobs: jobsToMatch.length,
+                    jobIds: jobs.map(j => j.jobId),
+                    selectedJob: jobId ? jobs.find(j => j.jobId === jobId) : null
+                });
+                
+                if (jobsToMatch.length === 0) {
+                    if (jobId) {
+                        throw new Error(`No job found with ID: ${jobId}. Available job IDs: ${jobs.map(j => j.jobId).join(', ')}`);
+                    } else {
+                        throw new Error('No jobs available to match against');
+                    }
+                }
+                
+                const matches = calculateMatches(candidateData, jobsToMatch);
+                
+                if (matches.length === 0) {
+                    showNoMatchesState();
+                    showAlert(`No suitable job matches found for ${candidateName} based on their skills and experience.`, 'info');
+                    return;
+                }
+                
+                currentMatches = matches;
+                displayMatches(matches, candidateData);
+                
+                // Show success message for fallback matching
+                showAlert(`Found ${matches.length} match${matches.length !== 1 ? 'es' : ''} for ${candidateName} using local analysis`, 'success');
+                
+            } catch (error) {
+                console.error('Client-side matching failed:', error);
+                showNoMatchesState();
+                
+                // Provide specific error messages based on the error
+                if (error.message.includes('No analysis data')) {
+                    showAlert(`${candidateName} hasn't been analyzed yet. Please wait for the analysis to complete or try uploading the resume again.`, 'warning');
+                } else if (error.message.includes('No jobs available')) {
+                    showAlert('No jobs are available for matching. Please add some job postings first.', 'info');
+                } else {
+                    showAlert(`Unable to find matches for ${candidateName}. Please try again later.`, 'error');
+                }
+            }
+        }
+
+        // Show alert messages
+        function showAlert(message, type = 'info') {
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-20 right-4 z-50 p-4 rounded-xl shadow-lg transition-all duration-300 transform translate-x-full`;
+            
+            // Set colors based on type
+            switch(type) {
+                case 'error':
+                    alertDiv.className += ' bg-red/20 border border-red/30 text-red';
+                    break;
+                case 'warning':
+                    alertDiv.className += ' bg-yellow/20 border border-yellow/30 text-yellow';
+                    break;
+                case 'success':
+                    alertDiv.className += ' bg-mint/20 border border-mint/30 text-mint';
+                    break;
+                default:
+                    alertDiv.className += ' bg-blue/20 border border-blue/30 text-blue';
+            }
+            
+            alertDiv.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i data-lucide="${type === 'error' ? 'alert-circle' : type === 'warning' ? 'alert-triangle' : type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5"></i>
+                    <span class="font-montserrat text-sm">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 hover:opacity-70">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            lucide.createIcons();
+            
+            // Animate in
+            setTimeout(() => {
+                alertDiv.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.classList.add('translate-x-full');
+                    setTimeout(() => alertDiv.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // Generate matches (AI-powered matching)
+        async function generateMatches() {
+            const candidateId = document.getElementById('candidateSelect').value;
+            
+            if (!candidateId) {
+                showAlert('Please select a candidate first', 'warning');
+                return;
+            }
+
+            showLoadingState();
+
+            try {
+                // Use the matches API to generate fresh matches
+                const response = await window.resumifyAPI.getMatches(candidateId, 20); // Get more matches for generation
+                
+                // Handle different response formats
+                let matchesData = [];
+                if (response && response.matches && Array.isArray(response.matches)) {
+                    // Direct API response format: {matches: [...], count: N}
+                    matchesData = response.matches;
+                } else if (response && response.success && response.data && Array.isArray(response.data)) {
+                    // API response format: {success: true, data: [...]}
+                    matchesData = response.data;
+                } else if (response && Array.isArray(response)) {
+                    // Direct array response
+                    matchesData = response;
+                }
+                
+                if (matchesData && matchesData.length > 0) {
+                    currentMatches = matchesData;
+                    
+                    // Get candidate data
+                    const analysisResponse = await window.resumifyAPI.getAnalysis(candidateId);
+                    let candidateData = analysisResponse.success ? analysisResponse.data : { name: 'Unknown', candidateId };
+                    
+                    // Enhance candidate data with analysis information
+                    if (analysisResponse.success && analysisResponse.data) {
+                        const analysis = analysisResponse.data;
+                        candidateData = {
+                            ...candidateData,
+                            ...analysis,
+                            // Extract skills from analysis
+                            skills: analysis.skills || [],
+                            // Extract experience from analysis
+                            experience: analysis.experience || [],
+                            // Use analysis status
+                            status: analysis.status || candidateData.status
+                        };
+                    }
+                    
+                    displayMatches(currentMatches, candidateData);
+                    showAlert('New matches generated successfully!', 'success');
+                } else {
+                    throw new Error(response.error || 'Failed to generate matches');
+                }
+            } catch (error) {
+                console.error('Failed to generate matches:', error);
+                showNoMatchesState();
+                showAlert('Failed to generate matches. Please try again.', 'error');
+            }
+        }
+
+        // Clean skill name by removing percentage indicators and other unwanted formatting
+        function cleanSkillName(skillName) {
+            if (!skillName || typeof skillName !== 'string') {
+                return skillName;
+            }
+            
+            // Remove percentage indicators like "(80%)", " 80%", " - 80%", etc.
+            const percentagePatterns = [
+                /\s*\(\d+%\)/g,           // (80%)
+                /\s*\(\d+\.\d+%\)/g,      // (85.5%)
+                /\s*-\s*\d+%/g,           // - 80%
+                /\s*:\s*\d+%/g,           // : 80%
+                /\s*\d+%/g,               // 80%
+                /\s*\(\d+\)/g,            // (80) - numbers in parentheses
+                /\s*-\s*\d+/g,            // - 80
+                /\s*:\s*\d+/g,            // : 80
+                /\s*\((?:Advanced|Expert|Proficient|Intermediate|Beginner)\)/gi,  // (Advanced), (Expert), etc.
+                /\s*-\s*(?:Advanced|Expert|Proficient|Intermediate|Beginner)/gi,  // - Advanced, - Expert, etc.
+                /\s*:\s*(?:Advanced|Expert|Proficient|Intermediate|Beginner)/gi,  // : Advanced, : Expert, etc.
+            ];
+            
+            let cleanedName = skillName.trim();
+            
+            // Apply each pattern to remove percentage indicators
+            percentagePatterns.forEach(pattern => {
+                cleanedName = cleanedName.replace(pattern, '');
+            });
+            
+            // Clean up any trailing/leading whitespace and punctuation
+            cleanedName = cleanedName.replace(/^[\s\-,:;]+|[\s\-,:;]+$/g, '');
+            
+            return cleanedName;
+        }
+
+        // Calculate matches between candidate and jobs
+        function calculateMatches(candidateData, jobsToMatch) {
+            const candidateSkills = candidateData.skills || [];
+            const candidateSkillNames = candidateSkills.map(skill => {
+                const skillName = skill.name ? skill.name : skill;
+                return cleanSkillName(skillName).toLowerCase();
+            });
+            
+            const matches = jobsToMatch.map(job => {
+                const jobSkills = job.requiredSkills || [];
+                const jobSkillNames = jobSkills.map(skill => skill.toLowerCase());
+                
+                // Calculate skill match percentage
+                const matchingSkills = jobSkillNames.filter(jobSkill => 
+                    candidateSkillNames.some(candidateSkill => 
+                        candidateSkill.includes(jobSkill) || jobSkill.includes(candidateSkill)
+                    )
+                );
+                
+                const skillMatchPercentage = jobSkillNames.length > 0 ? 
+                    (matchingSkills.length / jobSkillNames.length) * 100 : 0;
+                
+                // Calculate experience match
+                const experienceMatch = calculateExperienceMatch(candidateData.experience, job.experienceRequired);
+                
+                // Calculate overall match score
+                const overallScore = (skillMatchPercentage * 0.7) + (experienceMatch * 0.3);
+                
+                return {
+                    job: job,
+                    skillMatchPercentage: Math.round(skillMatchPercentage),
+                    experienceMatch: Math.round(experienceMatch),
+                    overallScore: Math.round(overallScore),
+                    matchingSkills: matchingSkills,
+                    missingSkills: jobSkillNames.filter(skill => !matchingSkills.includes(skill))
+                };
+            });
+
+            // Sort by overall score (highest first)
+            return matches.sort((a, b) => b.overallScore - a.overallScore);
+        }
+
+        // Calculate experience match
+        function calculateExperienceMatch(candidateExperience, jobExperienceRequired) {
+            if (!jobExperienceRequired || !candidateExperience) return 50;
+            
+            // Extract years from job requirement (e.g., "2-5 years" -> 3.5 average)
+            const jobYearsMatch = jobExperienceRequired.match(/(\d+)(?:-(\d+))?\s*years?/i);
+            if (!jobYearsMatch) return 50;
+            
+            const minYears = parseInt(jobYearsMatch[1]);
+            const maxYears = jobYearsMatch[2] ? parseInt(jobYearsMatch[2]) : minYears;
+            const avgRequiredYears = (minYears + maxYears) / 2;
+            
+            // Extract candidate experience years
+            let candidateYears = 0;
+            if (typeof candidateExperience === 'string') {
+                const candidateMatch = candidateExperience.match(/(\d+(?:\.\d+)?)/);
+                candidateYears = candidateMatch ? parseFloat(candidateMatch[1]) : 0;
+            } else if (candidateExperience.totalYears) {
+                candidateYears = parseFloat(candidateExperience.totalYears) || 0;
+            }
+            
+            // Calculate match percentage
+            if (candidateYears >= minYears && candidateYears <= maxYears) {
+                return 100; // Perfect match
+            } else if (candidateYears >= minYears) {
+                return Math.max(80, 100 - ((candidateYears - maxYears) * 5)); // Over-qualified
+            } else {
+                return Math.max(20, 100 - ((minYears - candidateYears) * 15)); // Under-qualified
+            }
+        }
+
+        // Display matches
+        function displayMatches(matches, candidateData) {
+            hideAllStates();
+            document.getElementById('matchesResults').classList.remove('hidden');
+            
+            const container = document.getElementById('matchesResults');
+            
+            if (!matches || matches.length === 0) {
+                showNoMatchesState();
+                return;
+            }
+            
+            // Add candidate info header
+            const candidateInfo = `
+                <div class="control-panel rounded-2xl p-6 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-cream heading-font">Matches for ${candidateData.candidateName || candidateData.name || 'Unknown'}</h2>
+                        <div class="text-lg font-bold text-mint font-montserrat mt-2 md:mt-0 bg-mint/10 px-4 py-2 rounded-lg border border-mint/30">
+                            Found ${matches.length} match${matches.length !== 1 ? 'es' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const matchCards = matches.map(match => createMatchCard(match)).join('');
+            container.innerHTML = candidateInfo + matchCards;
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Create match card HTML
+        function createMatchCard(match) {
+            // Handle both API response format and client-side calculated format
+            const job = match.job || match; // API format has nested job, client-side doesn't
+            const matchPercent = match.matchScore || match.matchPercent || match.overallScore || 0;
+            const matchedSkills = match.matchedSkills || match.matchingSkills || [];
+            const missingSkills = match.missingSkills || [];
+            
+            // Extract job details
+            const title = job.title || 'Unknown Position';
+            const company = job.company || 'Unknown Company';
+            const location = job.location || 'Remote';
+            const jobType = job.jobType || job.type || 'Full-time';
+            const experienceLevel = job.experience || job.experienceLevel || job.experienceRequired || 'Not specified';
+            const description = job.description || 'No description available';
+            const salary = job.salary || job.avgSalaryINR || job.salaryRange || null;
+            
+            const scoreColor = getScoreColor(matchPercent);
+            
+            // Display matched skills
+            const matchingSkillsDisplay = matchedSkills.slice(0, 5).map(skill => 
+                `<span class="skill-tag matching px-3 py-1 rounded-full text-xs font-medium font-montserrat">${cleanSkillName(skill)}</span>`
+            ).join('');
+            
+            // Display missing skills if available
+            const missingSkillsDisplay = missingSkills.slice(0, 3).map(skill => 
+                `<span class="skill-tag missing px-3 py-1 rounded-full text-xs font-medium font-montserrat">${cleanSkillName(skill)}</span>`
+            ).join('');
+            
+            // Create progress bar for overall match
+            const matchProgressBar = `
+                <div class="w-full bg-dark/50 rounded-full h-3 mb-2">
+                    <div class="bg-gradient-to-r ${scoreColor.gradient} h-3 rounded-full transition-all duration-500" style="width: ${matchPercent}%"></div>
+                </div>
+            `;
+            
+            // Format salary display
+            const salaryDisplay = salary ? 
+                (typeof salary === 'number' ? 
+                    window.resumifyAPI.formatCurrency(salary) : 
+                    salary) : 
+                'Not specified';
+            
+            return `
+                <div class="match-card rounded-2xl p-6">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-cream mb-2 heading-font card-text">${title}</h3>
+                            <p class="text-cream/70 mb-3 font-montserrat">${company} • ${location}</p>
+                            <div class="flex flex-wrap items-center gap-4 text-sm font-montserrat">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="briefcase" class="w-4 h-4 text-blue"></i>
+                                    <span class="text-cream/70">Type:</span>
+                                    <span class="text-cream">${jobType}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="trending-up" class="w-4 h-4 text-mint"></i>
+                                    <span class="text-cream/70">Level:</span>
+                                    <span class="text-cream">${experienceLevel}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4 text-yellow"></i>
+                                    <span class="text-cream/70">Salary:</span>
+                                    <span class="text-cream">${salaryDisplay}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Match Score Circle -->
+                        <div class="flex-shrink-0 ml-6">
+                            <div class="relative w-20 h-20">
+                                <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-dark/50" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                    <path class="${scoreColor.stroke}" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="${matchPercent}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-lg font-bold ${scoreColor.text} heading-font">${Math.round(matchPercent)}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Match Details -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-cream/70 font-montserrat">Overall Match</span>
+                            <span class="text-sm font-semibold ${scoreColor.text} font-montserrat">${Math.round(matchPercent)}%</span>
+                        </div>
+                        ${matchProgressBar}
+                    </div>
+                    
+                    <!-- Skills Section -->
+                    ${matchedSkills.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-cream mb-3 font-montserrat">Matching Skills</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${matchingSkillsDisplay}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${missingSkills.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-cream mb-3 font-montserrat">Skills to Develop</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${missingSkillsDisplay}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- Job Description -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-cream mb-2 font-montserrat">Job Description</h4>
+                        <p class="text-cream/70 text-sm font-montserrat leading-relaxed">${description}</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        <button onclick="viewJobDetails('${job.jobId || job.id || ''}')" class="accent-button flex-1 px-4 py-2 rounded-lg font-montserrat text-sm">
+                            <i data-lucide="eye" class="w-4 h-4 inline mr-2"></i>
+                            View Details
+                        </button>
+                        <button onclick="applyToJob('${job.jobId || job.id || ''}')" class="gradient-button flex-1 px-4 py-2 rounded-lg font-montserrat text-sm">
+                            <i data-lucide="send" class="w-4 h-4 inline mr-2"></i>
+                            Apply Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get score color based on match percentage
+        function getScoreColor(score) {
+            if (score >= 80) {
+                return {
+                    text: 'text-mint',
+                    stroke: 'stroke-mint',
+                    gradient: 'from-mint to-blue'
+                };
+            } else if (score >= 60) {
+                return {
+                    text: 'text-blue',
+                    stroke: 'stroke-blue', 
+                    gradient: 'from-blue to-purple-light'
+                };
+            } else if (score >= 40) {
+                return {
+                    text: 'text-yellow',
+                    stroke: 'stroke-yellow',
+                    gradient: 'from-yellow to-purple-light'
+                };
+            } else {
+                return {
+                    text: 'text-red',
+                    stroke: 'stroke-red',
+                    gradient: 'from-red to-yellow'
+                };
+            }
+        }
+
+        // View job details
+        function viewJobDetails(jobId) {
+            if (jobId) {
+                window.open(`/jobs.html?jobId=${jobId}`, '_blank');
+            } else {
+                showAlert('Job details not available', 'warning');
+            }
+        }
+
+        // Apply to job
+        function applyToJob(jobId) {
+            if (jobId) {
+                showAlert('Application feature coming soon!', 'info');
+            } else {
+                showAlert('Cannot apply - job ID not available', 'warning');
+            }
+        }
+
+        // Start real-time updates for candidates and jobs
+        function startRealTimeUpdates() {
+            window.realtimeDataUpdates.startCandidatesUpdates(
+                handleCandidatesUpdate,
+                handleUpdateError
+            );
+            
+            window.realtimeDataUpdates.startJobsUpdates(
+                handleJobsUpdate,
+                handleUpdateError
+            );
+        }
+
+        // Start real-time updates for matches
+        function startMatchesUpdates(candidateId) {
+            window.realtimeDataUpdates.startMatchesUpdates(
+                candidateId,
+                handleMatchesUpdate,
+                handleUpdateError
+            );
+        }
+
+        // Stop real-time updates for matches
+        function stopMatchesUpdates(candidateId) {
+            window.realtimeDataUpdates.stopUpdates(`matches_${candidateId}`);
+        }
+
+        // Stop all real-time updates
+        function stopAllRealTimeUpdates() {
+            window.realtimeDataUpdates.stopAllUpdates();
+        }
+
+        // State management functions
+        function hideAllStates() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('matchesResults').classList.add('hidden');
+            document.getElementById('noMatchesState').classList.add('hidden');
+            document.getElementById('initialState').classList.add('hidden');
+        }
+
+        function showLoadingState() {
+            hideAllStates();
+            document.getElementById('loadingState').classList.remove('hidden');
+        }
+
+        function showNoMatchesState() {
+            hideAllStates();
+            document.getElementById('noMatchesState').classList.remove('hidden');
+        }
+
+        function showInitialState() {
+            hideAllStates();
+            document.getElementById('initialState').classList.remove('hidden');
+        }
+
+        // Handle URL parameter changes (for bookmarked URLs or direct navigation)
+        function handleURLParameterChange() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const candidateId = urlParams.get('candidateId');
+            const jobId = urlParams.get('jobId');
+            
+            // Only process if we have candidates loaded and this is a different candidate
+            if (candidates.length > 0 && candidateId && candidateId !== currentCandidateId) {
+                const candidateExists = candidates.find(c => c.candidateId === candidateId);
+                
+                if (candidateExists) {
+                    document.getElementById('candidateSelect').value = candidateId;
+                    currentCandidateId = candidateId;
+                    findMatches();
+                }
+            }
+            
+            // Handle job parameter
+            if (jobs.length > 0 && jobId) {
+                const jobExists = jobs.find(j => j.jobId === jobId);
+                if (jobExists) {
+                    document.getElementById('jobSelect').value = jobId;
+                }
+            }
+        }
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            
+            // Handle page unload to clean up intervals
+            window.addEventListener('beforeunload', () => {
+                stopAllRealTimeUpdates();
+            });
+            
+            // Handle browser back/forward navigation
+            window.addEventListener('popstate', () => {
+                handleURLParameterChange();
+            });
+            
+            lucide.createIcons();
+            
+            // Handle candidate dropdown changes
+            const candidateSelect = document.getElementById('candidateSelect');
+            if (candidateSelect) {
+                candidateSelect.addEventListener('change', function() {
+                    const selectedCandidateId = this.value;
+                    
+                    // Update URL to reflect selection
+                    if (selectedCandidateId) {
+                        const url = new URL(window.location);
+                        url.searchParams.set('candidateId', selectedCandidateId);
+                        window.history.replaceState({}, '', url);
+                    } else {
+                        const url = new URL(window.location);
+                        url.searchParams.delete('candidateId');
+                        window.history.replaceState({}, '', url);
+                        showInitialState();
+                    }
+                });
+            }
+
+            // Handle job dropdown changes
+            const jobSelect = document.getElementById('jobSelect');
+            if (jobSelect) {
+                jobSelect.addEventListener('change', function() {
+                    const selectedJobId = this.value;
+                    
+                    // Update URL to reflect selection
+                    const url = new URL(window.location);
+                    if (selectedJobId) {
+                        url.searchParams.set('jobId', selectedJobId);
+                    } else {
+                        url.searchParams.delete('jobId');
+                    }
+                    window.history.replaceState({}, '', url);
+                });
+            }
+
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // Toggle menu icon
+                    const icon = mobileMenuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.setAttribute('data-lucide', 'menu');
+                    } else {
+                        icon.setAttribute('data-lucide', 'x');
+                    }
+                    lucide.createIcons();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

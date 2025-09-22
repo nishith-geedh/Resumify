@@ -1,0 +1,41 @@
+{
+  "file_processing": {
+    "pdf": {
+      "handler_exists": true,
+      "content_type_detection": false,
+      "processing_logic": true,
+      "overall_success": false
+    },
+    "txt": {
+      "handler_exists": true,
+      "content_type_detection": false,
+      "processing_logic": true,
+      "overall_success": false
+    },
+    "docx": {
+      "handler_exists": true,
+      "content_type_detection": false,
+      "processing_logic": true,
+      "overall_success": false
+    }
+  },
+  "frontend_integration": {
+    "api_configuration": true,
+    "upload_integration": true,
+    "analysis_integration": true,
+    "download_integration": true,
+    "overall_success": true
+  },
+  "backend_integration": {
+    "skills_extraction": true,
+    "experience_parsing": true,
+    "data_validation": true,
+    "overall_success": true
+  },
+  "error_handling": {
+    "javascript_errors": true,
+    "backend_errors": true,
+    "validation_errors": true,
+    "overall_success": true
+  }
+}

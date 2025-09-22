@@ -1,0 +1,76 @@
+
+ABHISHEK BAGADE
+Cloud Engineer • Artist • Freelancer
+
+Contact Information:
+📧 abhishekbagade15@gmail.com
+📱 +91 7090080896
+💼 linkedin.com/in/abhishek-rb/
+📍 Bengaluru
+
+PROFESSIONAL SUMMARY:
+Cloud Engineer with hands-on experience deploying real-world solutions on AWS and Azure. 
+Skilled in building serverless applications, implementing Infrastructure as Code using Terraform 
+and CloudFormation, and managing secure cloud environments. Proven track record in leading 
+cloud-based projects, optimizing costs, and enhancing system reliability.
+
+STATISTICS:
+• 2+ Years of Experience
+• 10+ Projects Completed
+• 80+ Artworks & Portraits
+
+EXPERIENCE:
+Cloud Operations Engineer & Operation Executive | May 2025 - Present
+ParadigmIT Technology Services Pvt. Ltd (Magicbricks) • Bengaluru
+• Directed Azure-based infrastructure and configured Virtual Machines
+• Scheduled patch updates for Windows servers via Azure Update Manager
+• Applied Azure Policies and Role-Based Access Control (RBAC)
+• Improved SLA compliance by 20%
+
+AWS Cloud Engineer Intern | May 2023 - August 2024
+F13 Technologies
+• Deployed cloud-native applications using AWS services
+• Created Infrastructure as Code using Terraform and CloudFormation
+• Reduced manual deployment time by 70% with CI/CD pipelines
+• Developed monitoring with CloudWatch Metrics and Alarms
+
+EDUCATION:
+Bachelor of Computer Application (BCA) | 2023
+Rani Channamma University, Vijayapura, Karnataka
+CGPA: 7.6/10 | Graduated with High Honors
+
+CERTIFICATIONS:
+✓ Microsoft Certified: Azure Fundamentals (AZ-900)
+✓ AWS Cloud Economics
+✓ AWS Technical Professional
+✓ AWS DevOps Navigate
+✓ AWS Data Analytics
+✓ AWS IoT
+✓ Generative AI – Foundations
+✓ Ethical Hacking
+
+TECHNICAL SKILLS:
+• Cloud Platforms: AWS (EC2, S3, Lambda, IAM, VPC, CloudFormation, Cognito, AppSync, CloudWatch), Azure (VMs, ASR, Backup Vault, Entra ID)
+• Languages: Python, Java, PowerShell
+• Databases: DynamoDB
+• DevOps Tools: Terraform, GitHub Actions, AWS CLI, CloudFormation
+• Security & Networking: IAM Policies, VPN, VPC, Nmap, Wireshark
+• Operating Systems: Linux (Ubuntu, RedHat), Windows
+
+KEY PROJECTS:
+1. Daily Expense Tracker with Analytics Dashboard
+   - Technologies: AWS Amplify, AppSync, Cognito, DynamoDB, GraphQL, SNS, Chart.js
+   
+2. Resume Parser & Skill Matcher
+   - Technologies: AWS Textract, Lambda, API Gateway, DynamoDB
+   
+3. AI Chatbot for IT Support (AWS)
+   - Technologies: AWS Lex, DynamoDB, S3, SES
+   
+4. Event Registration & Ticketing System (AWS)
+   - Technologies: AWS Amplify, Cognito, Lambda, S3, DynamoDB
+
+ADDITIONAL SKILLS:
+• Digital Artistry: 80+ artworks and portraits completed (Personal Hobby)
+• Languages: English (Professional), Kannada & Hindi (Fluent), Marathi (Native)
+        

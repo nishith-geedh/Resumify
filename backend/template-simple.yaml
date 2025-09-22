@@ -1,0 +1,333 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Resumify - Simplified Serverless Resume Parser (ap-south-1)
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+
+Resources:
+  ### S3 Bucket for Resumes ###
+  ResumesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "resumify-resumes-${AWS::AccountId}-ap-south-1-${Environment}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ### DynamoDB Tables ###
+  CandidatesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "Resumify_Candidates_${Environment}"
+      AttributeDefinitions:
+        - AttributeName: candidateId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: candidateId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  AnalysesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "Resumify_Analyses_${Environment}"
+      AttributeDefinitions:
+        - AttributeName: analysisId
+          AttributeType: S
+        - AttributeName: candidateId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: analysisId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: candidateId-index
+          KeySchema:
+            - AttributeName: candidateId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "Resumify_Jobs_${Environment}"
+      AttributeDefinitions:
+        - AttributeName: jobId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  MatchesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "Resumify_Matches_${Environment}"
+      AttributeDefinitions:
+        - AttributeName: candidateId
+          AttributeType: S
+        - AttributeName: jobId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+        - AttributeName: candidateId
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: candidateId-index
+          KeySchema:
+            - AttributeName: candidateId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  ### API Gateway ###
+  ResumifyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  ### Lambda Functions ###
+  UploadHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/upload_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+          RESUMES_BUCKET: !Ref ResumesBucket
+          DOCX_WORKER_FUNCTION: !Ref DocxTxtWorkerFunction
+          NLP_PROCESSOR_FUNCTION: !Ref NlpHandlerFunction
+      Events:
+        UploadApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /upload
+            Method: post
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref ResumesBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnalysesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: "*"
+
+  DocxTxtWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/docx_txt_worker/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 300
+      MemorySize: 1024
+      Environment:
+        Variables:
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+          RESUMES_BUCKET: !Ref ResumesBucket
+          NLP_HANDLER_FUNCTION: !Ref NlpHandlerFunction
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ResumesBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnalysesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: "*"
+
+  NlpHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/nlp_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 300
+      MemorySize: 1024
+      Environment:
+        Variables:
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+      Events:
+        AnalyzeApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /analyze
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnalysesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:*
+              Resource: "*"
+
+  CandidatesHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/candidates_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 45
+      MemorySize: 256
+      Environment:
+        Variables:
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+      Events:
+        CandidatesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /candidates
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AnalysesTable
+
+  AnalysisHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/analysis_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 45
+      MemorySize: 256
+      Environment:
+        Variables:
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+      Events:
+        AnalysisApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /analysis
+            Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AnalysesTable
+
+  JobsHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/jobs_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 45
+      MemorySize: 256
+      Environment:
+        Variables:
+          JOBS_TABLE: !Ref JobsTable
+      Events:
+        GetJobsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /jobs
+            Method: get
+        PostJobsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /jobs
+            Method: post
+        DeleteJobApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /jobs/{jobId}
+            Method: delete
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+
+  MatchesHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/matches_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          MATCHES_TABLE: !Ref MatchesTable
+          CANDIDATES_TABLE: !Ref CandidatesTable
+          ANALYSES_TABLE: !Ref AnalysesTable
+          JOBS_TABLE: !Ref JobsTable
+      Events:
+        MatchesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumifyApi
+            Path: /matches
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MatchesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref CandidatesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref AnalysesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref JobsTable
+
+Outputs:
+  ResumifyApiUrl:
+    Description: "API Gateway endpoint URL for ap-south-1"
+    Value: !Sub "https://${ResumifyApi}.execute-api.ap-south-1.amazonaws.com/${Environment}/"
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiUrl"
+  
+  ResumesBucketName:
+    Description: "S3 bucket for resumes in ap-south-1"
+    Value: !Ref ResumesBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-ResumesBucket"

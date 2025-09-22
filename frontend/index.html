@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumify - AI-Powered Resume Parser & Job Matcher</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cream': '#FFF2C6',
+                        'yellow': '#FFD646',
+                        'mint': '#00D7AB',
+                        'purple-light': '#DAA5FF',
+                        'purple-dark': '#6628AD',
+                        'blue': '#4EC4FE',
+                        'red': '#F24E32',
+                        'dark': '#191919'
+                    },
+                    fontFamily: {
+                        'sora': ['Sora', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Config -->
+    <script src="config.js"></script>
+    
+    <!-- Navigation and Error Handling Scripts -->
+    <script src="js/navigation.js"></script>
+    <script src="js/error-notifications.js"></script>
+    
+    <!-- Upload Styles -->
+    <link rel="stylesheet" href="styles/upload.css">
+    
+    <!-- Navigation and page styles -->
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/pages.css">
+    
+    <style>
+        body { 
+            background: rgb(25, 25, 25); /* dark */
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+        .heading-font {
+            font-family: 'Sora', sans-serif;
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.5); /* blue with opacity */
+        }
+        .glow-box {
+            box-shadow: 0 0 30px rgba(78, 196, 254, 0.3); /* blue with opacity */
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .gradient-border {
+            background: linear-gradient(45deg, rgb(78, 196, 254), rgb(218, 165, 255), rgb(0, 215, 171)); /* blue, purple-light, mint */
+            padding: 2px;
+            border-radius: 16px;
+        }
+        .gradient-border-inner {
+            background: rgb(25, 25, 25); /* dark */
+            border-radius: 14px;
+        }
+        
+        /* Feature Cards Improvements */
+        .feature-card {
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .feature-card:hover .card-text {
+            color: rgb(255, 242, 198) !important; /* cream */
+        }
+        
+        .feature-card .card-text {
+            transition: color 0.3s ease;
+            color: rgba(255, 242, 198, 0.9) !important; /* cream with opacity */
+        }
+        
+        /* Improve gradient border visibility */
+        .gradient-border-inner {
+            background: rgba(25, 25, 25, 0.95); /* dark with opacity */
+            border-radius: 14px;
+        }
+        
+        .feature-card .gradient-border-inner {
+            background: rgba(25, 25, 25, 0.98); /* dark with opacity */
+        }
+        
+        /* Icon styles */
+        .icon-container {
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover .icon-container {
+            transform: scale(1.1);
+        }
+        
+        /* Footer styles */
+        .footer {
+            background: linear-gradient(135deg, rgb(25, 25, 25) 0%, rgb(42, 26, 61) 50%, rgb(25, 25, 25) 100%); /* dark */
+            border-top: 1px solid rgba(218, 165, 255, 0.2); /* purple-light with opacity */
+        }
+        
+        .footer-section h4 {
+            color: rgb(78, 196, 254); /* blue */
+            margin-bottom: 1rem;
+        }
+        
+        .footer-link {
+            color: rgb(255, 242, 198); /* cream */
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
+            color: rgb(0, 215, 171); /* mint */
+            transform: translateX(4px);
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, rgb(78, 196, 254), rgb(218, 165, 255)); /* blue, purple-light */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 196, 254, 0.3); /* blue with opacity */
+        }
+        
+        /* Section visibility */
+        .section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .section.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Navigation active state */
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link.active {
+            color: rgb(255, 242, 198) !important; /* cream */
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, rgb(78, 196, 254), rgb(0, 215, 171)); /* blue, mint */
+            border-radius: 1px;
+        }
+        
+        /* Logo link styles */
+        .logo-link {
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-link:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-link:hover h1 {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-dark text-cream">
+    <!-- Navigation -->
+    <nav>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="nav-content">
+                <div class="flex items-center">
+                    <a href="/" class="logo-link" aria-label="Resumify Home">
+                        <div>
+                            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent heading-font">
+                                Resumify
+                            </h1>
+                            <p class="text-sm text-purple-light/70 font-montserrat">AI-Powered Matching</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="desktop-nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="mobile-nav hidden">
+                <div class="mobile-nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-96 h-96 bg-purple-light/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-20 left-1/3 w-80 h-80 bg-mint/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10">
+        <!-- Hero Section -->
+        <section id="home" class="section active min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark relative overflow-hidden pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <!-- Left Content -->
+                    <div class="space-y-10">
+                        <div class="space-y-8">
+                            <h1 class="text-6xl lg:text-8xl font-bold leading-tight heading-font">
+                                <span class="text-cream">Transform Resumes into</span>
+                                <br>
+                                <span class="bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent glow-text">
+                                    Perfect Matches
+                                </span>
+                            </h1>
+                            
+                            <p class="text-xl text-cream/80 leading-relaxed max-w-2xl font-montserrat">
+                                AI-powered resume parsing with AWS Textract and intelligent job matching. 
+                                Extract skills, analyze experience, and find the perfect candidates instantly.
+                            </p>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="/upload.html" class="group relative px-8 py-4 bg-gradient-to-r from-blue to-mint rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat text-center">
+                                <span class="relative z-10">Get Started</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Visual -->
+                    <div class="relative flex justify-center">
+                        <div class="relative animate-float">
+                            <!-- Animated Card -->
+                            <div class="gradient-border">
+                                <div class="gradient-border-inner p-8">
+                                    <div class="text-center space-y-6">
+                                        <div class="flex items-center justify-center space-x-3 mb-6">
+                                            <div class="w-8 h-8 bg-gradient-to-r from-yellow to-mint rounded-lg flex items-center justify-center">
+                                                <i data-lucide="file-text" class="w-4 h-4 text-dark"></i>
+                                            </div>
+                                            <span class="text-cream font-semibold font-montserrat">Resume Analysis</span>
+                                        </div>
+                                        
+                                        <!-- Animated Progress Circle -->
+                                        <div class="relative w-32 h-32 mx-auto">
+                                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                                <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="8" fill="none" class="text-purple-light/20"></circle>
+                                                <circle cx="60" cy="60" r="50" stroke="url(#gradient)" stroke-width="8" fill="none" 
+                                                        stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="47" 
+                                                        class="transition-all duration-2000 ease-out" id="progress-circle">
+                                                </circle>
+                                                <defs>
+                                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                        <stop offset="0%" style="stop-color:rgb(78, 196, 254)"/> <!-- blue -->
+                                                        <stop offset="50%" style="stop-color:rgb(218, 165, 255)"/> <!-- purple-light -->
+                                                        <stop offset="100%" style="stop-color:rgb(0, 215, 171)"/> <!-- mint -->
+                                                    </linearGradient>
+                                                </defs>
+                                            </svg>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span class="text-3xl font-bold text-cream" id="progress-text">87%</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <p class="text-cream/80 font-montserrat">Skills Extracted</p>
+                                            <div class="flex flex-wrap gap-2 justify-center">
+                                                <span class="px-3 py-1 bg-blue/20 text-blue rounded-full text-sm border border-blue/30">Python</span>
+                                                <span class="px-3 py-1 bg-mint/20 text-mint rounded-full text-sm border border-mint/30">React</span>
+                                                <span class="px-3 py-1 bg-purple-light/20 text-purple-light rounded-full text-sm border border-purple-light/30">AWS</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="absolute -top-4 -right-4 w-8 h-8 bg-yellow rounded-full animate-bounce" style="animation-delay: 0.5s;"></div>
+                            <div class="absolute -bottom-4 -left-4 w-6 h-6 bg-mint rounded-full animate-bounce" style="animation-delay: 1s;"></div>
+                            <div class="absolute top-1/2 -right-8 w-4 h-4 bg-red rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Resumify Section -->
+        <section id="why-resumify" class="py-32 bg-gradient-to-r from-purple-dark/10 to-dark relative">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-8 heading-font">
+                        <span class="bg-gradient-to-r from-yellow via-mint to-blue bg-clip-text text-transparent">
+                            Why Resumify?
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/70 max-w-3xl mx-auto font-montserrat">
+                        Revolutionize your hiring process with AI-powered resume analysis and intelligent job matching
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="group relative feature-card">
+                        <div class="gradient-border h-full">
+                            <div class="gradient-border-inner p-8 h-full text-center space-y-6 hover:bg-blue/5 transition-all duration-300">
+                                <div class="w-20 h-20 bg-gradient-to-r from-blue to-purple-light rounded-2xl flex items-center justify-center mx-auto icon-container">
+                                    <i data-lucide="file-search" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-cream heading-font">Smart Parsing</h3>
+                                <p class="text-cream/70 card-text font-montserrat leading-relaxed">Extract text from PDF, DOCX, and TXT files using AWS Textract with 99% accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="group relative feature-card">
+                        <div class="gradient-border h-full">
+                            <div class="gradient-border-inner p-8 h-full text-center space-y-6 hover:bg-mint/5 transition-all duration-300">
+                                <div class="w-20 h-20 bg-gradient-to-r from-mint to-yellow rounded-2xl flex items-center justify-center mx-auto icon-container">
+                                    <i data-lucide="brain" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-cream heading-font">AI Analysis</h3>
+                                <p class="text-cream/70 card-text font-montserrat leading-relaxed">Identify skills, experience, and qualifications with Amazon Comprehend NLP</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="group relative feature-card">
+                        <div class="gradient-border h-full">
+                            <div class="gradient-border-inner p-8 h-full text-center space-y-6 hover:bg-purple-light/5 transition-all duration-300">
+                                <div class="w-20 h-20 bg-gradient-to-r from-purple-light to-red rounded-2xl flex items-center justify-center mx-auto icon-container">
+                                    <i data-lucide="target" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-cream heading-font">Perfect Matching</h3>
+                                <p class="text-cream/70 card-text font-montserrat leading-relaxed">Find ideal job matches using advanced Jaccard similarity algorithms</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 4 -->
+                    <div class="group relative feature-card">
+                        <div class="gradient-border h-full">
+                            <div class="gradient-border-inner p-8 h-full text-center space-y-6 hover:bg-yellow/5 transition-all duration-300">
+                                <div class="w-20 h-20 bg-gradient-to-r from-yellow to-blue rounded-2xl flex items-center justify-center mx-auto icon-container">
+                                    <i data-lucide="bar-chart-3" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-cream heading-font">Recruiter Dashboard</h3>
+                                <p class="text-cream/70 card-text font-montserrat leading-relaxed">Comprehensive analytics and insights for data-driven hiring decisions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Resumify Section -->
+        <section class="py-32 bg-gradient-to-l from-dark via-purple-dark/10 to-dark">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-20">
+  
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-16">
+                    <!-- Card 1 -->
+                    <div class="text-center space-y-8 group feature-card">
+                        <div class="w-28 h-28 bg-gradient-to-r from-blue to-mint rounded-3xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 glow-box icon-container">
+                            <i data-lucide="zap" class="w-12 h-12 text-dark"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-cream heading-font">Extract Skills with AI</h3>
+                        <p class="text-cream/70 leading-relaxed text-lg font-montserrat card-text">
+                            Leverage AWS Textract and Amazon Comprehend to automatically extract and categorize technical and soft skills from any resume format.
+                        </p>
+                    </div>
+                    
+                    <!-- Card 2 -->
+                    <div class="text-center space-y-8 group feature-card">
+                        <div class="w-28 h-28 bg-gradient-to-r from-purple-light to-yellow rounded-3xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 glow-box icon-container">
+                            <i data-lucide="cpu" class="w-12 h-12 text-dark"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-cream heading-font">Intelligent Job Matching</h3>
+                        <p class="text-cream/70 leading-relaxed text-lg font-montserrat card-text">
+                            Advanced AI algorithms analyze candidate profiles and match them with the most suitable job opportunities based on skills and experience.
+                        </p>
+                    </div>
+                    
+                    <!-- Card 3 -->
+                    <div class="text-center space-y-8 group feature-card">
+                        <div class="w-28 h-28 bg-gradient-to-r from-mint to-red rounded-3xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 glow-box icon-container">
+                            <i data-lucide="trending-up" class="w-12 h-12 text-dark"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-cream heading-font">Fast Candidate Reports</h3>
+                        <p class="text-cream/70 leading-relaxed text-lg font-montserrat card-text">
+                            Generate comprehensive candidate reports instantly with detailed skill analysis, experience breakdown, and match recommendations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-32 bg-gradient-to-r from-purple-dark via-blue/20 to-mint/20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue/10 via-purple-light/10 to-mint/10 animate-pulse"></div>
+            <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+                <h2 class="text-4xl lg:text-6xl font-bold mb-8 heading-font">
+                    <span class="bg-gradient-to-r from-cream via-yellow to-cream bg-clip-text text-transparent">
+                        Ready to find the perfect match?
+                    </span>
+                </h2>
+                <p class="text-xl text-cream/80 mb-12 max-w-2xl mx-auto font-montserrat">
+                    Join thousands of recruiters who are already using Resumify to streamline their hiring process and find top talent faster.
+                </p>
+                <a href="/upload.html" class="group relative px-12 py-6 bg-gradient-to-r from-yellow via-mint to-blue rounded-2xl font-bold text-xl text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat inline-block">
+                    <span class="relative z-10">Upload Your Resume</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue via-mint to-yellow rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section id="upload" class="section min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-6 heading-font">
+                        <span class="bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent">
+                            Upload Your Resume
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/80 font-montserrat">Get AI-powered insights in seconds</p>
+                </div>
+                
+                <form id="uploadForm" class="space-y-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-cream font-semibold mb-2 font-montserrat">Candidate Name</label>
+                            <input type="text" id="candidateName" name="name" required 
+                                   class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream placeholder-cream/50 focus:border-blue focus:outline-none transition-colors font-montserrat"
+                                   placeholder="Enter candidate name">
+                        </div>
+                        <div>
+                            <label class="block text-cream font-semibold mb-2 font-montserrat">Email</label>
+                            <input type="email" id="candidateEmail" name="email" required 
+                                   class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream placeholder-cream/50 focus:border-blue focus:outline-none transition-colors font-montserrat"
+                                   placeholder="candidate@example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner p-8">
+                            <div class="text-center space-y-4" id="fileUploadArea">
+                                <div class="w-16 h-16 bg-gradient-to-r from-blue to-mint rounded-2xl flex items-center justify-center mx-auto upload-icon">
+                                    <i data-lucide="upload" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-cream heading-font">Drag & Drop Resume</h3>
+                                <p class="text-cream/70 font-montserrat">or <span class="text-blue cursor-pointer hover:underline upload-link">browse files</span></p>
+                                <p class="text-sm text-cream/50 font-montserrat">Supports PDF, DOCX, TXT files (Max 10MB)</p>
+                                <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" class="hidden">
+                                <div class="file-info" id="fileInfo" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="px-8 py-4 bg-gradient-to-r from-blue to-mint rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat" id="uploadBtn">
+                            Upload & Process
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Upload Status -->
+                <div id="uploadStatus" class="mt-8 text-center" style="display: none;">
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner p-8">
+                            <div class="space-y-4">
+                                <div class="w-16 h-16 bg-gradient-to-r from-yellow to-mint rounded-2xl flex items-center justify-center mx-auto animate-spin">
+                                    <i data-lucide="loader-2" class="w-8 h-8 text-dark"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-cream heading-font" id="statusTitle">Processing...</h3>
+                                <p class="text-cream/70 font-montserrat" id="statusMessage">Extracting text from resume</p>
+                                <div class="w-full bg-purple-light/20 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-blue to-mint h-2 rounded-full transition-all duration-500" id="progressFill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Results -->
+                <div id="uploadResults" class="mt-8" style="display: none;">
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner p-8 text-center">
+                            <div class="w-16 h-16 bg-gradient-to-r from-mint to-yellow rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="check-circle" class="w-8 h-8 text-dark"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-cream mb-4 heading-font">Upload Successful!</h3>
+                            <div class="space-y-2 mb-6">
+                                <p class="text-cream/70 font-montserrat"><strong>Candidate ID:</strong> <span id="resultCandidateId" class="text-blue"></span></p>
+                                <p class="text-cream/70 font-montserrat"><strong>Status:</strong> <span id="resultStatus" class="text-mint"></span></p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                <button onclick="viewExtractedText()" class="px-6 py-3 border border-purple-light/50 rounded-xl text-purple-light hover:bg-purple-light/10 transition-colors font-montserrat">
+                                    View Extracted Text
+                                </button>
+                                <button onclick="continueToAnalysis()" class="px-6 py-3 bg-gradient-to-r from-blue to-mint rounded-xl text-dark font-semibold hover:scale-105 transition-transform font-montserrat">
+                                    Continue to Analysis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis" class="section min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-6 heading-font">
+                        <span class="bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent">
+                            Resume Analysis
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/80 font-montserrat">Comprehensive AI-powered resume insights</p>
+                </div>
+                <div id="analysisContent">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Candidates Section -->
+        <section id="candidates" class="section min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-6 heading-font">
+                        <span class="bg-gradient-to-r from-blue to-mint bg-clip-text text-transparent">
+                            Candidates
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/80 font-montserrat">Manage and review candidate profiles</p>
+                </div>
+                
+                <!-- Search and Filter Bar -->
+                <div class="gradient-border mb-8">
+                    <div class="gradient-border-inner p-6">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1">
+                                <input type="text" id="candidateSearch" placeholder="Search candidates..." 
+                                       class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream placeholder-cream/50 focus:border-blue focus:outline-none transition-colors font-montserrat">
+                            </div>
+                            <div class="flex gap-4">
+                                <select id="skillFilter" class="px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                    <option value="">All Skills</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="python">Python</option>
+                                    <option value="react">React</option>
+                                    <option value="aws">AWS</option>
+                                </select>
+                                <select id="experienceFilter" class="px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                    <option value="">All Experience</option>
+                                    <option value="0-2">0-2 years</option>
+                                    <option value="3-5">3-5 years</option>
+                                    <option value="5+">5+ years</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="candidatesList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Candidates will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Jobs Section -->
+        <section id="jobs" class="section min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-6 heading-font">
+                        <span class="bg-gradient-to-r from-purple-light to-yellow bg-clip-text text-transparent">
+                            Job Postings
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/80 font-montserrat">Manage job postings and requirements</p>
+                </div>
+                
+                <!-- Add Job Button -->
+                <div class="text-center mb-8">
+                    <button onclick="showAddJobModal()" class="px-8 py-4 bg-gradient-to-r from-purple-light to-yellow rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat">
+                        <i data-lucide="plus" class="w-5 h-5 inline mr-2"></i>
+                        Add New Job
+                    </button>
+                </div>
+                
+                <!-- Job Filters -->
+                <div class="gradient-border mb-8">
+                    <div class="gradient-border-inner p-6">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1">
+                                <input type="text" id="jobSearch" placeholder="Search jobs..." 
+                                       class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream placeholder-cream/50 focus:border-blue focus:outline-none transition-colors font-montserrat">
+                            </div>
+                            <div class="flex gap-4">
+                                <select id="jobTypeFilter" class="px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                    <option value="">All Types</option>
+                                    <option value="full-time">Full-time</option>
+                                    <option value="part-time">Part-time</option>
+                                    <option value="contract">Contract</option>
+                                    <option value="remote">Remote</option>
+                                </select>
+                                <select id="locationFilter" class="px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                    <option value="">All Locations</option>
+                                    <option value="remote">Remote</option>
+                                    <option value="bangalore">Bangalore</option>
+                                    <option value="mumbai">Mumbai</option>
+                                    <option value="delhi">Delhi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="jobsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Jobs will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Matches Section -->
+        <section id="matches" class="section min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl lg:text-6xl font-bold mb-6 heading-font">
+                        <span class="bg-gradient-to-r from-mint to-red bg-clip-text text-transparent">
+                            Job Matches
+                        </span>
+                    </h2>
+                    <p class="text-xl text-cream/80 font-montserrat">AI-powered candidate-job matching</p>
+                </div>
+                
+                <!-- Match Controls -->
+                <div class="gradient-border mb-8">
+                    <div class="gradient-border-inner p-6">
+                        <div class="flex flex-col md:flex-row gap-4 items-center">
+                            <div class="flex-1">
+                                <label class="block text-cream font-semibold mb-2 font-montserrat">Select Candidate</label>
+                                <select id="candidateSelect" class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                    <option value="">Choose a candidate...</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-4">
+                                <button onclick="generateMatches()" class="px-6 py-3 bg-gradient-to-r from-mint to-blue rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat">
+                                    Generate Matches
+                                </button>
+                                <button onclick="exportMatches()" class="px-6 py-3 border-2 border-mint/50 rounded-xl font-semibold text-mint hover:bg-mint/10 transition-all duration-300 hover:border-mint font-montserrat">
+                                    Export Results
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Match Threshold Slider -->
+                <div class="gradient-border mb-8">
+                    <div class="gradient-border-inner p-6">
+                        <div class="flex items-center gap-4">
+                            <label class="text-cream font-semibold font-montserrat">Match Threshold:</label>
+                            <input type="range" id="matchThreshold" min="0" max="100" value="70" 
+                                   class="flex-1 h-2 bg-purple-light/20 rounded-lg appearance-none cursor-pointer">
+                            <span id="thresholdValue" class="text-cream font-bold font-montserrat">70%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="matchesList" class="space-y-6">
+                    <!-- Matches will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer py-16 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Company Info -->
+                <div class="space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent heading-font">
+                            Resumify
+                        </h1>
+                        <p class="text-sm text-purple-light/70 font-montserrat">AI-Powered Matching</p>
+                    </div>
+                    <p class="text-cream/70 font-montserrat leading-relaxed">
+                        Transform your hiring process with AI-powered resume analysis and intelligent job matching. Find the perfect candidates faster than ever.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="social-icon">
+                            <i data-lucide="twitter" class="w-5 h-5 text-dark"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i data-lucide="linkedin" class="w-5 h-5 text-dark"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i data-lucide="github" class="w-5 h-5 text-dark"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i data-lucide="mail" class="w-5 h-5 text-dark"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Product -->
+                <div class="footer-section">
+                    <h4 class="heading-font font-semibold">Product</h4>
+                    <ul class="space-y-3">
+                        <li><a href="/upload" class="footer-link font-montserrat">Upload Resume</a></li>
+                        <li><a href="/candidates" class="footer-link font-montserrat">View Candidates</a></li>
+                        <li><a href="/jobs" class="footer-link font-montserrat">Job Postings</a></li>
+                        <li><a href="/matches" class="footer-link font-montserrat">Job Matches</a></li>
+                        <li><a href="/analysis" class="footer-link font-montserrat">Analysis</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Features -->
+                <div class="footer-section">
+                    <h4 class="heading-font font-semibold">Features</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="footer-link font-montserrat">AI Resume Parsing</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Skill Extraction</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Job Matching</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Analytics Dashboard</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">API Access</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div class="footer-section">
+                    <h4 class="heading-font font-semibold">Support</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="footer-link font-montserrat">Documentation</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">API Reference</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Help Center</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Contact Us</a></li>
+                        <li><a href="#" class="footer-link font-montserrat">Status Page</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div class="border-t border-purple-light/20 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <p class="text-cream/60 font-montserrat">
+                        © 2025 Resumify. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="footer-link font-montserrat text-sm">Privacy Policy</a>
+                        <a href="#" class="footer-link font-montserrat text-sm">Terms of Service</a>
+                        <a href="#" class="footer-link font-montserrat text-sm">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/error-handling.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/pages.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Mobile Menu Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // Toggle menu icon
+                    const icon = mobileMenuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.setAttribute('data-lucide', 'menu');
+                    } else {
+                        icon.setAttribute('data-lucide', 'x');
+                    }
+                    
+                    // Reinitialize lucide icons
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+        
+        // Initialize GSAP animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate progress circle on load
+        gsap.to("#progress-circle", {
+            strokeDashoffset: 47,
+            duration: 2,
+            ease: "power2.out",
+            delay: 1
+        });
+        
+        // Animate counter
+        gsap.to("#progress-text", {
+            innerHTML: "87%",
+            duration: 2,
+            ease: "power2.out",
+            delay: 1,
+            snap: { innerHTML: 1 }
+        });
+        
+        // Scroll animations
+        gsap.utils.toArray(".gradient-border").forEach((card, i) => {
+            gsap.fromTo(card, 
+                { y: 50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 80%",
+                        end: "bottom 20%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+    </script>
+</body>
+</html>

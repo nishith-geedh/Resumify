@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates - Resumify</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- Navigation and dropdown styles -->
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/dropdown-fixes.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cream': '#FFF2C6',
+                        'yellow': '#FFD646',
+                        'mint': '#00D7AB',
+                        'purple-light': '#DAA5FF',
+                        'purple-dark': '#6628AD',
+                        'blue': '#4EC4FE',
+                        'red': '#F24E32',
+                        'dark': '#191919'
+                    },
+                    fontFamily: {
+                        'sora': ['Sora', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .heading-font {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Navigation active state */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link.active {
+            color: rgb(255, 242, 198) !important;
+            /* cream */
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, rgb(78, 196, 254), rgb(0, 215, 171));
+            /* blue, mint */
+            border-radius: 1px;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.5);
+            /* blue with opacity */
+        }
+
+        .glow-box {
+            box-shadow: 0 0 30px rgba(78, 196, 254, 0.3);
+            /* blue with opacity */
+        }
+
+        .gradient-border {
+            background: linear-gradient(45deg, rgb(78, 196, 254), rgb(218, 165, 255), rgb(0, 215, 171));
+            /* blue, purple-light, mint */
+            padding: 2px;
+            border-radius: 16px;
+        }
+
+        .gradient-border-inner {
+            background: rgb(25, 25, 25);
+            /* dark */
+            border-radius: 14px;
+        }
+
+        /* Feature Cards Improvements */
+        .feature-card {
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .feature-card:hover .card-text {
+            color: rgb(255, 242, 198) !important;
+            /* cream */
+        }
+
+        .feature-card .card-text {
+            transition: color 0.3s ease;
+            color: rgba(255, 242, 198, 0.9) !important;
+            /* cream with opacity */
+        }
+
+        /* Improve gradient border visibility */
+        .feature-card .gradient-border-inner {
+            background: rgba(25, 25, 25, 0.98);
+            /* dark with opacity */
+        }
+
+        /* Icon styles */
+        .icon-container {
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .icon-container {
+            transform: scale(1.1);
+        }
+
+        /* Logo link styles */
+        .logo-link {
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .logo-link:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-link:hover h1 {
+            text-shadow: 0 0 20px rgba(78, 196, 254, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-cream">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-96 h-96 bg-purple-light/20 rounded-full blur-3xl animate-pulse"
+            style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-20 left-1/3 w-80 h-80 bg-mint/20 rounded-full blur-3xl animate-pulse"
+            style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="nav-content">
+                <div class="flex items-center">
+                    <a href="/" class="logo-link" aria-label="Resumify Home">
+                        <div>
+                            <h1
+                                class="text-3xl font-bold bg-gradient-to-r from-blue via-purple-light to-mint bg-clip-text text-transparent heading-font">
+                                Resumify
+                            </h1>
+                            <p class="text-sm text-purple-light/70 font-montserrat">AI-Powered Matching</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="desktop-nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle mobile menu"
+                    aria-expanded="false">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobileMenu" class="mobile-nav hidden">
+                <div class="mobile-nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/upload.html" class="nav-link">Upload</a>
+                    <a href="/analysis.html" class="nav-link">Analysis</a>
+                    <a href="/candidates.html" class="nav-link">Candidates</a>
+                    <a href="/jobs.html" class="nav-link">Jobs</a>
+                    <a href="/matches.html" class="nav-link">Matches</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 min-h-screen bg-gradient-to-br from-dark via-purple-dark/20 to-dark pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <h1 class="text-4xl font-bold heading-font">Candidates</h1>
+                        <div id="realTimeIndicator"
+                            class="flex items-center space-x-2 px-3 py-1 bg-mint/20 border border-mint/30 rounded-full">
+                            <div class="w-2 h-2 bg-mint rounded-full animate-pulse"></div>
+                            <span class="text-xs text-mint font-montserrat">Live Updates</span>
+                        </div>
+                    </div>
+                    <p class="text-cream/80 text-lg font-montserrat">Manage and view all candidate profiles</p>
+                </div>
+                <a href="/upload.html"
+                    class="group relative px-6 py-3 bg-gradient-to-r from-mint to-yellow rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat inline-block">
+                    <span class="relative z-10">Add New Candidate</span>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-yellow to-mint rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                </a>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="gradient-border mb-8">
+                <div class="gradient-border-inner p-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <input type="text" id="searchInput" placeholder="Search candidates by name or email..."
+                                class="w-full px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream placeholder-cream/50 focus:border-blue focus:outline-none transition-colors font-montserrat">
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="statusFilter"
+                                class="dropdown-select px-4 py-3 bg-purple-light/10 border border-purple-light/30 rounded-xl text-cream focus:border-blue focus:outline-none transition-colors font-montserrat">
+                                <option value="">All Status</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                            <button onclick="refreshCandidates()"
+                                class="px-4 py-3 bg-gradient-to-r from-blue/20 to-mint/20 hover:from-blue/30 hover:to-mint/30 text-cream border border-blue/30 rounded-xl transition-all duration-300 hover:scale-105 font-montserrat"
+                                title="Refresh candidates">
+                                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-12">
+                <div class="gradient-border">
+                    <div class="gradient-border-inner p-8">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-r from-blue to-mint rounded-2xl flex items-center justify-center mx-auto mb-4 animate-spin">
+                            <i data-lucide="loader-2" class="w-8 h-8 text-dark"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-cream mb-2 heading-font">Loading Candidates...</h3>
+                        <p class="text-cream/70 font-montserrat">Fetching candidate data from database</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates Grid -->
+            <div id="candidatesGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Candidate cards will be inserted here -->
+            </div>
+
+            <!-- No Candidates State -->
+            <div id="noCandidatesState" class="hidden text-center py-12">
+                <div class="gradient-border">
+                    <div class="gradient-border-inner p-8">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-r from-blue to-mint rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="users" class="w-8 h-8 text-dark"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-cream mb-2 heading-font">No Candidates Found</h3>
+                        <p class="text-cream/70 mb-6 font-montserrat">Upload some resumes to get started</p>
+                        <a href="/upload.html"
+                            class="group relative px-6 py-3 bg-gradient-to-r from-mint to-yellow rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat inline-block">
+                            <span class="relative z-10">Upload First Resume</span>
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-yellow to-mint rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/api-status.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/error-notifications.js"></script>
+    <script src="js/dropdown-enhancements.js"></script>
+    <script src="js/realtime-data-updates.js"></script>
+    <script>
+        let allCandidates = [];
+        let filteredCandidates = [];
+        let isInitialLoad = true;
+
+        // Load candidates from DynamoDB with real-time update integration
+        async function loadCandidates(showNotification = false) {
+            try {
+                const response = await window.resumifyAPI.getCandidates();
+
+                // Handle different response formats
+                let candidatesData = [];
+
+                if (response && response.success && response.data) {
+                    if (Array.isArray(response.data)) {
+                        candidatesData = response.data;
+                    } else if (response.data.data && Array.isArray(response.data.data)) {
+                        // API response format: {success: true, data: {data: [...], count: N}}
+                        candidatesData = response.data.data;
+                    } else if (response.data.Items && Array.isArray(response.data.Items)) {
+                        // DynamoDB scan response format
+                        candidatesData = response.data.Items;
+                    } else if (typeof response.data === 'object') {
+                        // If it's an object, try to extract array from common properties
+                        candidatesData = response.data.candidates || response.data.items || [];
+                        if (!Array.isArray(candidatesData)) {
+                            console.warn('Data is object but no array found:', response.data);
+                            candidatesData = [];
+                        }
+                    } else {
+                        candidatesData = [];
+                    }
+                } else if (response && response.candidates && Array.isArray(response.candidates)) {
+                    // Direct API response format: {candidates: [...], count: N}
+                    candidatesData = response.candidates;
+                } else if (response && Array.isArray(response)) {
+                    candidatesData = response;
+                } else {
+                    console.warn('Unexpected response format:', response);
+                    candidatesData = [];
+                }
+
+
+
+                allCandidates = candidatesData;
+                filteredCandidates = [...allCandidates];
+                updateStatusFilter();
+                displayCandidates();
+
+            } catch (error) {
+                console.error('Failed to load candidates:', error);
+
+                // Initialize empty arrays to prevent further errors
+                allCandidates = [];
+                filteredCandidates = [];
+
+                document.getElementById('loadingState').classList.add('hidden');
+
+                // Show error message instead of no candidates state
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-center py-12';
+                errorDiv.innerHTML = `
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner p-8">
+                            <div class="w-16 h-16 bg-gradient-to-r from-red/20 to-red/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="alert-circle" class="w-8 h-8 text-red"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-cream mb-2 heading-font">Unable to Load Candidates</h3>
+                            <p class="text-cream/70 mb-6 font-montserrat">The server is temporarily unavailable. Please try again in a few minutes.</p>
+                            <button onclick="refreshCandidates()" class="group relative px-6 py-3 bg-gradient-to-r from-mint to-yellow rounded-xl font-semibold text-dark transition-all duration-300 hover:scale-105 glow-box font-montserrat">
+                                <span class="relative z-10">Try Again</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                const container = document.querySelector('.max-w-7xl.mx-auto.px-6');
+                const existingError = container.querySelector('.error-state');
+                if (existingError) {
+                    existingError.remove();
+                }
+                errorDiv.classList.add('error-state');
+                container.appendChild(errorDiv);
+
+                // Reinitialize icons
+                lucide.createIcons();
+            }
+        }
+
+        // Handle real-time candidates updates
+        function handleCandidatesUpdate(newCandidates, changeInfo) {
+            console.log('Real-time update received:', newCandidates, changeInfo);
+
+            // Ensure newCandidates is an array and has valid data
+            let candidatesData = [];
+
+            if (Array.isArray(newCandidates)) {
+                candidatesData = newCandidates;
+            } else if (newCandidates && newCandidates.data && Array.isArray(newCandidates.data)) {
+                candidatesData = newCandidates.data;
+            } else if (newCandidates && typeof newCandidates === 'object') {
+                // Handle the same response format as the initial load
+                if (newCandidates.data && Array.isArray(newCandidates.data)) {
+                    candidatesData = newCandidates.data;
+                } else {
+                    console.warn('Unexpected real-time update format:', newCandidates);
+                    return; // Don't update if format is unexpected
+                }
+            } else {
+                console.warn('Invalid real-time update data:', newCandidates);
+                return; // Don't update if data is invalid
+            }
+
+            // Only update if we have valid data
+            if (candidatesData.length > 0 || (changeInfo && changeInfo.changeType === 'removed')) {
+                allCandidates = candidatesData;
+                updateStatusFilter();
+                filterCandidates();
+            }
+
+            // Show notification for changes (but not on initial load)
+            if (!isInitialLoad && changeInfo.changeType !== 'none') {
+                window.realtimeDataUpdates.showChangeNotification('candidates', changeInfo);
+
+                // Update real-time indicator
+                updateRealTimeIndicator('candidates', changeInfo);
+
+                // Scroll to top if new candidates were added to show them
+                if (changeInfo.changeType === 'added' && changeInfo.changeCount > 0) {
+                    setTimeout(() => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 500);
+                }
+            }
+
+            isInitialLoad = false;
+        }
+
+        // Handle real-time update errors
+        function handleCandidatesUpdateError(error) {
+            console.error('Real-time candidates update error:', error);
+
+            // Ensure arrays are initialized to prevent further errors
+            if (!Array.isArray(allCandidates)) {
+                allCandidates = [];
+            }
+            if (!Array.isArray(filteredCandidates)) {
+                filteredCandidates = [];
+            }
+
+            // Show error indicator
+            const indicator = document.getElementById('realTimeIndicator');
+            if (indicator) {
+                indicator.innerHTML = `
+                    <div class="w-2 h-2 bg-red rounded-full"></div>
+                    <span class="text-xs text-red font-montserrat">Update Error</span>
+                `;
+
+                // Reset after 5 seconds
+                setTimeout(() => {
+                    indicator.innerHTML = `
+                        <div class="w-2 h-2 bg-mint rounded-full animate-pulse"></div>
+                        <span class="text-xs text-mint font-montserrat">Live Updates</span>
+                    `;
+                }, 5000);
+            }
+        }
+
+        // Update real-time indicator
+        function updateRealTimeIndicator(type, changeInfo) {
+            const indicator = document.getElementById('realTimeIndicator');
+            if (!indicator) return;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            if (changeInfo.changeType === 'added') {
+                indicator.innerHTML = `
+                    <div class="w-2 h-2 bg-mint rounded-full animate-pulse"></div>
+                    <span class="text-xs text-mint font-montserrat">+${changeInfo.changeCount} Added</span>
+                `;
+            } else if (changeInfo.changeType === 'removed') {
+                indicator.innerHTML = `
+                    <div class="w-2 h-2 bg-yellow rounded-full animate-pulse"></div>
+                    <span class="text-xs text-yellow font-montserrat">-${changeInfo.changeCount} Removed</span>
+                `;
+            }
+
+            // Reset to normal after 3 seconds, showing last update time
+            setTimeout(() => {
+                indicator.innerHTML = `
+                    <div class="w-2 h-2 bg-mint rounded-full animate-pulse"></div>
+                    <span class="text-xs text-mint font-montserrat">Live Updates</span>
+                    <span class="text-xs text-mint/70 font-montserrat ml-1">${timeString}</span>
+                `;
+            }, 3000);
+        }
+
+        // Display candidates
+        function displayCandidates() {
+            document.getElementById('loadingState').classList.add('hidden');
+
+            if (filteredCandidates.length === 0) {
+                document.getElementById('candidatesGrid').classList.add('hidden');
+                document.getElementById('noCandidatesState').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('noCandidatesState').classList.add('hidden');
+            document.getElementById('candidatesGrid').classList.remove('hidden');
+
+            // Sort candidates by creation date (newest first)
+            const sortedCandidates = [...filteredCandidates].sort((a, b) => {
+                const dateA = new Date(a.createdAt || 0);
+                const dateB = new Date(b.createdAt || 0);
+                return dateB - dateA; // Newest first
+            });
+
+            const grid = document.getElementById('candidatesGrid');
+            grid.innerHTML = sortedCandidates.map(candidate => createCandidateCard(candidate)).join('');
+
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Create candidate card HTML - Simplified version
+        function createCandidateCard(candidate) {
+            const displayName = candidate.name || 'Unknown Candidate';
+            const displayEmail = candidate.email || 'No email provided';
+            const candidateId = candidate.candidateId || '';
+
+            // Map status for display
+            let displayStatus = candidate.status || 'uploaded';
+            if (displayStatus === 'text_extracted') {
+                displayStatus = 'analyzed';
+            } else if (displayStatus === 'text_extraction_failed') {
+                displayStatus = 'failed';
+            }
+
+            const statusColor = getStatusColor(displayStatus);
+
+            return `
+                <div class="gradient-border feature-card group">
+                    <div class="gradient-border-inner p-6 h-full">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue to-mint rounded-2xl flex items-center justify-center icon-container">
+                                    <i data-lucide="user" class="w-6 h-6 text-dark"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-lg font-semibold text-cream heading-font truncate" title="${displayName}">${displayName}</h3>
+                                    <p class="text-cream/70 text-sm font-montserrat truncate" title="${displayEmail}">${displayEmail}</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColor.bg} ${statusColor.text} font-montserrat whitespace-nowrap">
+                                ${displayStatus}
+                            </span>
+                        </div>
+
+                        <div class="space-y-2 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-cream/70 font-montserrat">Candidate ID:</span>
+                                <span class="text-cream font-montserrat text-xs font-mono">${candidateId.substring(0, 8)}...</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-cream/70 font-montserrat">Status:</span>
+                                <span class="text-cream font-montserrat capitalize">${displayStatus}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="viewResume('${candidateId}')" 
+                                    class="flex-1 px-3 py-2 bg-gradient-to-r from-purple-light/20 to-blue/20 hover:from-purple-light/30 hover:to-blue/30 text-purple-light border border-purple-light/30 rounded-xl text-sm transition-all duration-300 hover:scale-105 font-montserrat">
+                                View Resume
+                            </button>
+                            <button onclick="findMatches('${candidateId}')" 
+                                    class="flex-1 px-3 py-2 bg-gradient-to-r from-mint/20 to-yellow/20 hover:from-mint/30 hover:to-yellow/30 text-mint border border-mint/30 rounded-xl text-sm transition-all duration-300 hover:scale-105 font-montserrat">
+                                Find Matches
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get status color classes
+        function getStatusColor(status) {
+            switch (status) {
+                case 'analyzed':
+                    return { bg: 'bg-mint/20', text: 'text-mint' };
+                case 'processing':
+                    return { bg: 'bg-yellow/20', text: 'text-yellow' };
+                case 'failed':
+                    return { bg: 'bg-red/20', text: 'text-red' };
+                default:
+                    return { bg: 'bg-cream/20', text: 'text-cream' };
+            }
+        }
+
+        // Get text extraction status color
+        function getTextStatusColor(status) {
+            switch (status) {
+                case 'completed':
+                    return 'text-mint';
+                case 'processing':
+                    return 'text-yellow';
+                case 'failed':
+                    return 'text-red';
+                default:
+                    return 'text-cream/70';
+            }
+        }
+
+        // Update status filter with only existing statuses
+        function updateStatusFilter() {
+            const statusFilter = document.getElementById('statusFilter');
+            if (!statusFilter) return;
+
+            const currentValue = statusFilter.value;
+
+            // Ensure allCandidates is an array before processing
+            if (!Array.isArray(allCandidates)) {
+                console.warn('allCandidates is not an array, skipping status filter update');
+                return;
+            }
+
+            // Get unique statuses from all candidates and map them for display
+            const rawStatuses = allCandidates.map(candidate => candidate.status).filter(Boolean);
+            const mappedStatuses = rawStatuses.map(status => {
+                if (status === 'text_extracted') return 'analyzed';
+                if (status === 'text_extraction_failed') return 'failed';
+                return status;
+            });
+
+            const uniqueStatuses = [...new Set(mappedStatuses)];
+            uniqueStatuses.sort();
+
+            // Update dropdown options
+            statusFilter.innerHTML = '<option value="">All Status</option>';
+            uniqueStatuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusFilter.appendChild(option);
+            });
+
+            // Restore previous selection if it still exists
+            if (uniqueStatuses.includes(currentValue)) {
+                statusFilter.value = currentValue;
+            }
+        }
+
+        // Search and filter functions
+        function setupFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+
+            searchInput.addEventListener('input', filterCandidates);
+            statusFilter.addEventListener('change', filterCandidates);
+        }
+
+        function filterCandidates() {
+            // Ensure allCandidates is an array
+            if (!Array.isArray(allCandidates)) {
+                console.warn('allCandidates is not an array, initializing as empty array');
+                allCandidates = [];
+            }
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredCandidates = allCandidates.filter(candidate => {
+                const matchesSearch = !searchTerm ||
+                    (candidate.name && candidate.name.toLowerCase().includes(searchTerm)) ||
+                    (candidate.email && candidate.email.toLowerCase().includes(searchTerm));
+
+                // Map the candidate status for filtering
+                let candidateStatus = candidate.status;
+                if (candidateStatus === 'text_extracted') candidateStatus = 'analyzed';
+                if (candidateStatus === 'text_extraction_failed') candidateStatus = 'failed';
+
+                const matchesStatus = !statusFilter || candidateStatus === statusFilter;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            displayCandidates();
+        }
+
+        // Action functions
+        async function viewResume(candidateId) {
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Loading...';
+                button.disabled = true;
+
+                // Try to get extracted text from analysis table
+                try {
+                    const response = await window.resumifyAPI.getAnalysis(candidateId);
+                    const analysisData = response.success ? response.data : response;
+
+                    if (analysisData && analysisData.extractedText && analysisData.extractedText !== 'Processing...' && analysisData.extractedText.length > 50) {
+                        showResumeModal(candidateId, analysisData.extractedText);
+                        button.textContent = originalText;
+                        button.disabled = false;
+                        return;
+                    } else if (analysisData && analysisData.extractedText === 'Processing...') {
+                        showResumeModal(candidateId, 'Resume text is currently being processed. Please try again in a few minutes.\n\nIf this issue persists, the resume may have failed to process correctly.');
+                        button.textContent = originalText;
+                        button.disabled = false;
+                        return;
+                    }
+                } catch (apiError) {
+                    console.warn('Analysis API failed, trying alternative approach:', apiError);
+                }
+
+                // Fallback: Show a message that the resume is being processed
+                showResumeModal(candidateId, 'Resume text is currently being processed. Please try again in a few minutes.\n\nIf this issue persists, the resume may have failed to process correctly.');
+
+                // Reset button
+                button.textContent = originalText;
+                button.disabled = false;
+
+            } catch (error) {
+                console.error('Failed to load resume:', error);
+
+                // Reset button
+                const button = event.target;
+                button.textContent = 'View Resume';
+                button.disabled = false;
+
+                // Show user-friendly error message
+                alert('Unable to load resume text. The resume may still be processing or there was an error during text extraction.');
+            }
+        }
+
+        function showResumeModal(candidateId, extractedText) {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="gradient-border max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                    <div class="gradient-border-inner bg-dark">
+                        <div class="flex items-center justify-between p-6 border-b border-cream/20">
+                            <h3 class="text-xl font-semibold text-cream heading-font">Resume Text - ${candidateId.substring(0, 8)}...</h3>
+                            <button onclick="closeResumeModal()" class="text-cream/70 hover:text-cream transition-colors">
+                                <i data-lucide="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto max-h-[70vh]">
+                            <div class="bg-cream/5 rounded-xl p-4 border border-cream/10">
+                                <pre class="text-cream/90 font-montserrat text-sm whitespace-pre-wrap leading-relaxed">${extractedText}</pre>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 p-6 border-t border-cream/20">
+                            <button onclick="downloadResumeText('${candidateId}', \`${extractedText.replace(/`/g, '\\`')}\`)" 
+                                    class="px-4 py-2 bg-gradient-to-r from-mint/20 to-yellow/20 hover:from-mint/30 hover:to-yellow/30 text-mint border border-mint/30 rounded-xl text-sm transition-all duration-300 font-montserrat">
+                                Download Text
+                            </button>
+                            <button onclick="closeResumeModal()" 
+                                    class="px-4 py-2 bg-gradient-to-r from-purple-light/20 to-blue/20 hover:from-purple-light/30 hover:to-blue/30 text-purple-light border border-purple-light/30 rounded-xl text-sm transition-all duration-300 font-montserrat">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            lucide.createIcons();
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeResumeModal();
+                }
+            });
+        }
+
+        function closeResumeModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black\\/50');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function downloadResumeText(candidateId, extractedText) {
+            const blob = new Blob([extractedText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `resume_${candidateId.substring(0, 8)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function findMatches(candidateId) {
+            window.location.href = `/matches.html?candidateId=${candidateId}`;
+        }
+
+        function refreshCandidates() {
+            console.log('Refreshing candidates...');
+
+            // Clear any existing error states
+            const container = document.querySelector('.max-w-7xl.mx-auto.px-6');
+            const existingError = container.querySelector('.error-state');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Reset UI state
+            document.getElementById('candidatesGrid').classList.add('hidden');
+            document.getElementById('noCandidatesState').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+
+            // Reset data arrays
+            allCandidates = [];
+            filteredCandidates = [];
+
+            // Reload candidates
+            loadCandidates();
+        }
+
+
+
+        // Start real-time updates using the new system
+        function startRealTimeUpdates() {
+            // Temporarily disable real-time updates to prevent candidates from disappearing
+            console.log('Real-time updates temporarily disabled to prevent data loss');
+            // window.realtimeDataUpdates.startCandidatesUpdates(
+            //     handleCandidatesUpdate,
+            //     handleCandidatesUpdateError
+            // );
+        }
+
+        // Stop real-time updates
+        function stopRealTimeUpdates() {
+            window.realtimeDataUpdates.stopUpdates('candidates');
+        }
+
+        // Enable fast updates during active operations
+        function enableFastUpdates() {
+            window.realtimeDataUpdates.enableFastUpdates('candidates');
+        }
+
+        // Disable fast updates
+        function disableFastUpdates() {
+            window.realtimeDataUpdates.disableFastUpdates('candidates');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Candidates page loaded, initializing...');
+            setupFilters();
+
+            // Test API availability first
+            if (window.resumifyAPI) {
+                console.log('API client available, loading candidates...');
+                loadCandidates();
+            } else {
+                console.error('API client not available');
+                // Initialize empty arrays to prevent errors
+                allCandidates = [];
+                filteredCandidates = [];
+                displayCandidates();
+            }
+
+            // Start real-time updates
+            startRealTimeUpdates();
+
+            // Handle page unload to clean up intervals
+            window.addEventListener('beforeunload', () => {
+                stopRealTimeUpdates();
+            });
+
+            // Handle page focus/blur for efficient polling
+            window.addEventListener('focus', () => {
+                console.log('🔄 Page focused - enabling fast updates');
+                enableFastUpdates();
+
+                // Disable fast updates after 2 minutes of activity
+                setTimeout(() => {
+                    disableFastUpdates();
+                }, 120000);
+            });
+
+            // Mobile menu functionality is now handled by navigation.js
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

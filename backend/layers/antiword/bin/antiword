@@ -1,0 +1,4 @@
+#!/bin/bash
+# Placeholder antiword binary - this would be replaced with actual antiword binary in production
+echo "Antiword not available in this environment"
+exit 1

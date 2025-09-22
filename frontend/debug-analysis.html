@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Analysis - Resumify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': '#1A1A1A',
+                        'cream': '#FFF2C6',
+                        'mint': '#00D7AB',
+                        'yellow': '#FFD646',
+                        'purple-light': '#4EC4FE',
+                        'red': '#F24E32'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark text-cream min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-8 text-center">Debug Analysis Issue</h1>
+        
+        <div class="bg-dark/50 backdrop-blur-sm border border-cream/20 rounded-2xl p-8">
+            <div id="debugInfo" class="mb-6 p-4 bg-yellow/20 border border-yellow/30 rounded-xl">
+                <h3 class="text-yellow font-semibold mb-2">Debug Information:</h3>
+                <div id="debugContent"></div>
+            </div>
+            
+            <button onclick="debugAnalysis()" class="bg-gradient-to-r from-mint to-yellow text-dark font-semibold px-6 py-3 rounded-xl hover:shadow-lg transition-all mb-6">
+                Debug Analysis Issue
+            </button>
+            
+            <div id="results" class="hidden">
+                <h3 class="text-xl font-semibold mb-4">Debug Results:</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        function debugAnalysis() {
+            const debugContent = document.getElementById('debugContent');
+            const results = document.getElementById('results');
+            const resultContent = document.getElementById('resultContent');
+            
+            // Get current URL and parameters
+            const currentUrl = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlCandidateId = urlParams.get('candidateId');
+            const sessionCandidateId = sessionStorage.getItem('currentCandidateId');
+            
+            // Show debug info
+            debugContent.innerHTML = `
+                <p><strong>Current URL:</strong> ${currentUrl}</p>
+                <p><strong>URL candidateId:</strong> ${urlCandidateId || 'None'}</p>
+                <p><strong>Session candidateId:</strong> ${sessionCandidateId || 'None'}</p>
+                <p><strong>Expected candidateId:</strong> 0b07d724-0b19-4805-9d2f-aa0977c8ca92</p>
+            `;
+            
+            // Determine which candidate ID would be used
+            const candidateId = urlCandidateId || sessionCandidateId;
+            
+            if (!candidateId) {
+                resultContent.innerHTML = '<p class="text-red">❌ No candidate ID found!</p>';
+                results.classList.remove('hidden');
+                return;
+            }
+            
+            // Test API call with the candidate ID that would be used
+            testAPICall(candidateId);
+        }
+        
+        async function testAPICall(candidateId) {
+            const resultContent = document.getElementById('resultContent');
+            const results = document.getElementById('results');
+            
+            resultContent.innerHTML = `<p class="text-yellow">⏳ Testing API with candidateId: ${candidateId}</p>`;
+            results.classList.remove('hidden');
+            
+            try {
+                const response = await window.resumifyAPI.getAnalysis(candidateId);
+                
+                if (response.success && response.data) {
+                    const data = response.data;
+                    
+                    resultContent.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="p-4 bg-mint/20 border border-mint/30 rounded-xl">
+                                <h4 class="text-mint font-semibold mb-2">✅ API Response Successful</h4>
+                                <p><strong>Candidate ID:</strong> ${data.candidateId}</p>
+                                <p><strong>Name:</strong> ${data.name || data.candidateName || 'Unknown'}</p>
+                                <p><strong>Email:</strong> ${data.email || data.candidateEmail || 'Unknown'}</p>
+                                <p><strong>Text Status:</strong> ${data.textExtractionStatus || 'Unknown'}</p>
+                            </div>
+                            
+                            <div class="p-4 bg-purple-light/20 border border-purple-light/30 rounded-xl">
+                                <h4 class="text-purple-light font-semibold mb-2">📄 Text Preview</h4>
+                                <p><strong>Characters:</strong> ${data.extractedText ? data.extractedText.length : 0}</p>
+                                <p><strong>First 100 chars:</strong></p>
+                                <pre class="text-sm bg-dark/50 p-2 rounded mt-2">${data.extractedText ? data.extractedText.substring(0, 100) + '...' : 'No text'}</pre>
+                            </div>
+                            
+                            <div class="p-4 bg-dark/30 border border-cream/20 rounded-xl">
+                                <h4 class="font-semibold mb-2">🔍 Issue Analysis</h4>
+                                ${analyzeIssue(data)}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultContent.innerHTML = `<p class="text-red">❌ API call failed: ${response.error || 'Unknown error'}</p>`;
+                }
+                
+            } catch (error) {
+                resultContent.innerHTML = `<p class="text-red">❌ API Error: ${error.message}</p>`;
+            }
+        }
+        
+        function analyzeIssue(data) {
+            const issues = [];
+            
+            if (!data.name && !data.candidateName) {
+                issues.push('❌ Missing candidate name');
+            }
+            
+            if (!data.email && !data.candidateEmail) {
+                issues.push('❌ Missing candidate email');
+            }
+            
+            if (!data.extractedText || data.extractedText === 'Processing...') {
+                issues.push('❌ Missing or processing extracted text');
+            }
+            
+            if (data.extractedText && data.extractedText.includes('ABHISHEK BAGADE')) {
+                issues.push('❌ Wrong candidate text - showing Abhishek instead of Nishith');
+            }
+            
+            if (data.extractedText && data.extractedText.includes('Nishith Geedh')) {
+                issues.push('✅ Correct candidate text - showing Nishith');
+            }
+            
+            if (issues.length === 0) {
+                return '<p class="text-mint">✅ No issues detected - data looks correct!</p>';
+            }
+            
+            return '<ul class="space-y-1">' + issues.map(issue => `<li>${issue}</li>`).join('') + '</ul>';
+        }
+        
+        // Auto-debug on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(debugAnalysis, 500);
+        });
+    </script>
+</body>
+</html>

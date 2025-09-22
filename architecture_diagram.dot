@@ -1,0 +1,323 @@
+digraph ResumifyArchitecture {
+    // Graph settings
+    rankdir=TB;
+    bgcolor="#f8fafc";
+    fontname="Arial, sans-serif";
+    fontsize=16;
+    splines=ortho;
+    nodesep=1.5;
+    ranksep=3.0;
+    
+    // Node styles
+    node [
+        shape=box,
+        style=filled,
+        fontname="Arial, sans-serif",
+        fontsize=14,
+        fontcolor="#1a202c",
+        fixedsize=false,
+        width=3.5,
+        height=1.8
+    ];
+    
+    // Edge styles
+    edge [
+        color="#4a5568",
+        penwidth=3,
+        fontname="Arial, sans-serif",
+        fontsize=12,
+        fontcolor="#4a5568",
+        labeldistance=2.5,
+        labelangle=0
+    ];
+    
+    // Title
+    labelloc=t;
+    label="Resumify - Architecture Diagram";
+    fontsize=32;
+    fontcolor="#2d3748";
+    fontname="Arial, bold";
+    
+    // Frontend Layer
+    subgraph cluster_frontend {
+        label="Frontend Layer (Static Web)";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#e6fffa";
+        color="#38b2ac";
+        penwidth=3;
+        
+        frontend_pages [
+            label="Web Pages\n(index.html, candidates.html,\nmatches.html, analysis.html, jobs.html)",
+            fillcolor="#b2f5ea",
+            color="#234e52"
+        ];
+        
+        frontend_js [
+            label="JavaScript Modules\n(api.js, upload.js,\nrealtime-*.js, navigation.js)",
+            fillcolor="#b2f5ea",
+            color="#234e52"
+        ];
+        
+        frontend_styles [
+            label="CSS Styles\n(main.css, components.css,\nanimations.css)",
+            fillcolor="#b2f5ea",
+            color="#234e52"
+        ];
+    }
+    
+    // API Gateway Layer
+    subgraph cluster_api {
+        label="API Gateway Layer";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#fef5e7";
+        color="#ed8936";
+        penwidth=3;
+        
+        api_gateway [
+            label="REST API Gateway\n(CORS enabled, HTTPS)",
+            fillcolor="#fed7aa",
+            color="#9c4221"
+        ];
+        
+        api_endpoints [
+            label="API Endpoints\n(/upload, /candidates,\n/analysis, /jobs, /matches)",
+            fillcolor="#fed7aa",
+            color="#9c4221"
+        ];
+    }
+    
+    // Lambda Functions Layer
+    subgraph cluster_lambda {
+        label="Lambda Functions Layer (Serverless)";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#f0fff4";
+        color="#38a169";
+        penwidth=3;
+        
+        upload_handler [
+            label="Upload Handler\n(File validation, S3 storage,\nTextract initiation)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        docx_worker [
+            label="DOCX/DOC Worker\n(Text extraction from\nDOCX/DOC files)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        textract_handler [
+            label="Textract Result Handler\n(Process PDF OCR results,\nSNS notifications)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        nlp_handler [
+            label="NLP Handler\n(Skill extraction, experience\nanalysis using Comprehend)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        analysis_handler [
+            label="Analysis Handler\n(Retrieve and format\nanalysis results)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        candidates_handler [
+            label="Candidates Handler\n(Manage candidate data\nretrieval)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        jobs_handler [
+            label="Jobs Handler\n(CRUD operations for\njob postings)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+        
+        matches_handler [
+            label="Matches Handler\n(Calculate job-candidate\nmatches using Jaccard similarity)",
+            fillcolor="#c6f6d5",
+            color="#22543d"
+        ];
+    }
+    
+    // Storage Layer
+    subgraph cluster_storage {
+        label="Storage Layer";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#faf5ff";
+        color="#805ad5";
+        penwidth=3;
+        
+        s3_bucket [
+            label="S3 Bucket\n(resumify-resumes-\n{account}-ap-south-1-dev)",
+            fillcolor="#e9d8fd",
+            color="#44337a"
+        ];
+        
+        dynamodb_candidates [
+            label="DynamoDB\nCandidates Table\n(candidateId, name, email,\nstatus, fileType)",
+            fillcolor="#e9d8fd",
+            color="#44337a"
+        ];
+        
+        dynamodb_analyses [
+            label="DynamoDB\nAnalyses Table\n(analysisId, candidateId,\nskills, experience, score)",
+            fillcolor="#e9d8fd",
+            color="#44337a"
+        ];
+        
+        dynamodb_jobs [
+            label="DynamoDB\nJobs Table\n(jobId, title, company,\nrequiredSkills, description)",
+            fillcolor="#e9d8fd",
+            color="#44337a"
+        ];
+        
+        dynamodb_matches [
+            label="DynamoDB\nMatches Table\n(candidateId, jobId,\nmatchScore, matchingSkills)",
+            fillcolor="#e9d8fd",
+            color="#44337a"
+        ];
+    }
+    
+    // External Services
+    subgraph cluster_external {
+        label="External AWS Services";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#fff5f5";
+        color="#e53e3e";
+        penwidth=3;
+        
+        textract [
+            label="AWS Textract\n(OCR for PDF files,\nasynchronous processing)",
+            fillcolor="#fed7d7",
+            color="#742a2a"
+        ];
+        
+        comprehend [
+            label="Amazon Comprehend\n(NLP analysis, entity\nrecognition, key phrases)",
+            fillcolor="#fed7d7",
+            color="#742a2a"
+        ];
+        
+        sns_topic [
+            label="SNS Topic\n(Textract job completion\nnotifications)",
+            fillcolor="#fed7d7",
+            color="#742a2a"
+        ];
+        
+        cloudwatch [
+            label="CloudWatch\n(Logging, monitoring,\nmetrics, alerts)",
+            fillcolor="#fed7d7",
+            color="#742a2a"
+        ];
+    }
+    
+    // IAM and Security
+    subgraph cluster_security {
+        label="Security & IAM";
+        fontsize=18;
+        fontcolor="#2d3748";
+        fontname="Arial, bold";
+        style=filled;
+        fillcolor="#edf2f7";
+        color="#4a5568";
+        penwidth=3;
+        
+        iam_roles [
+            label="IAM Roles & Policies\n(Least privilege access,\nencrypted environment variables)",
+            fillcolor="#e2e8f0",
+            color="#2d3748"
+        ];
+        
+        textract_role [
+            label="Textract Role\n(Allows Lambda to assume\nTextract permissions)",
+            fillcolor="#e2e8f0",
+            color="#2d3748"
+        ];
+    }
+    
+    // Frontend to API Gateway connections
+    frontend_pages -> api_gateway [label="HTTPS/REST", color="#38b2ac", labeldistance=1.5];
+    frontend_js -> api_gateway [label="Axios HTTP Client", color="#38b2ac", labeldistance=1.5];
+    
+    // API Gateway to Lambda connections
+    api_gateway -> upload_handler [label="POST /upload", color="#ed8936", labeldistance=1.5];
+    api_gateway -> analysis_handler [label="GET /analysis", color="#ed8936", labeldistance=1.5];
+    api_gateway -> candidates_handler [label="GET /candidates", color="#ed8936", labeldistance=1.5];
+    api_gateway -> jobs_handler [label="GET/POST /jobs", color="#ed8936", labeldistance=1.5];
+    api_gateway -> matches_handler [label="GET /matches", color="#ed8936", labeldistance=1.5];
+    api_gateway -> nlp_handler [label="POST /analyze", color="#ed8936", labeldistance=1.5];
+    
+    // Lambda to Lambda connections
+    upload_handler -> docx_worker [label="Async Invoke\n(DOCX/DOC files)", color="#38a169", labeldistance=1.5];
+    upload_handler -> textract [label="Start Textract Job\n(PDF files)", color="#38a169", labeldistance=1.5];
+    textract_handler -> nlp_handler [label="Async Invoke\n(After OCR completion)", color="#38a169", labeldistance=1.5];
+    docx_worker -> nlp_handler [label="Async Invoke\n(After text extraction)", color="#38a169", labeldistance=1.5];
+    
+    // Lambda to Storage connections
+    upload_handler -> s3_bucket [label="Store Files", color="#805ad5", labeldistance=1.5];
+    upload_handler -> dynamodb_candidates [label="Create Candidate Record", color="#805ad5", labeldistance=1.5];
+    docx_worker -> dynamodb_analyses [label="Create Analysis Record", color="#805ad5", labeldistance=1.5];
+    textract_handler -> dynamodb_analyses [label="Create Analysis Record", color="#805ad5", labeldistance=1.5];
+    nlp_handler -> dynamodb_analyses [label="Update Analysis Data", color="#805ad5", labeldistance=1.5];
+    analysis_handler -> dynamodb_analyses [label="Query Analysis Data", color="#805ad5", labeldistance=1.5];
+    analysis_handler -> dynamodb_candidates [label="Query Candidate Data", color="#805ad5", labeldistance=1.5];
+    candidates_handler -> dynamodb_candidates [label="Scan Candidates", color="#805ad5", labeldistance=1.5];
+    jobs_handler -> dynamodb_jobs [label="CRUD Operations", color="#805ad5", labeldistance=1.5];
+    matches_handler -> dynamodb_analyses [label="Query Analysis Data", color="#805ad5", labeldistance=1.5];
+    matches_handler -> dynamodb_jobs [label="Query Jobs Data", color="#805ad5", labeldistance=1.5];
+    matches_handler -> dynamodb_matches [label="Store Match Results", color="#805ad5", labeldistance=1.5];
+    
+    // External service connections
+    upload_handler -> textract [label="StartDocumentTextDetection", color="#e53e3e", labeldistance=1.5];
+    textract -> sns_topic [label="Job Completion Notification", color="#e53e3e", labeldistance=1.5];
+    sns_topic -> textract_handler [label="SNS Event Trigger", color="#e53e3e", labeldistance=1.5];
+    textract_handler -> textract [label="GetDocumentTextDetection", color="#e53e3e", labeldistance=1.5];
+    nlp_handler -> comprehend [label="DetectEntities,\nDetectKeyPhrases", color="#e53e3e", labeldistance=1.5];
+    
+    // Monitoring connections
+    upload_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    docx_worker -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    textract_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    nlp_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    analysis_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    candidates_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    jobs_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    matches_handler -> cloudwatch [label="Logs & Metrics", color="#4a5568", labeldistance=1.5];
+    
+    // Security connections
+    upload_handler -> iam_roles [label="Uses IAM Role", color="#2d3748", labeldistance=1.5];
+    docx_worker -> iam_roles [label="Uses IAM Role", color="#2d3748", labeldistance=1.5];
+    textract_handler -> iam_roles [label="Uses IAM Role", color="#2d3748", labeldistance=1.5];
+    nlp_handler -> iam_roles [label="Uses IAM Role", color="#2d3748", labeldistance=1.5];
+    textract -> textract_role [label="Assume Role", color="#2d3748", labeldistance=1.5];
+    
+    // Data flow annotations
+    frontend_pages [pos="0,8"];
+    api_gateway [pos="0,6"];
+    upload_handler [pos="-4,4"];
+    textract [pos="-6,2"];
+    s3_bucket [pos="-2,2"];
+    dynamodb_candidates [pos="0,2"];
+    dynamodb_analyses [pos="2,2"];
+    dynamodb_jobs [pos="4,2"];
+    dynamodb_matches [pos="6,2"];
+}

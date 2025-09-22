@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Analysis Display - Resumify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark': '#1A1A1A',
+                        'cream': '#FFF2C6',
+                        'mint': '#00D7AB',
+                        'yellow': '#FFD646',
+                        'purple-light': '#4EC4FE',
+                        'red': '#F24E32'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark text-cream min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-8 text-center">Fix Analysis Display</h1>
+        
+        <div class="bg-dark/50 backdrop-blur-sm border border-cream/20 rounded-2xl p-8">
+            <div class="mb-6 p-4 bg-red/20 border border-red/30 rounded-xl">
+                <h3 class="text-red font-semibold mb-2">Issue:</h3>
+                <p>Analysis page showing wrong candidate data (Abhishek instead of Nishith)</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <button onclick="clearSessionStorage()" class="w-full bg-red/20 hover:bg-red/30 text-red border border-red/30 px-6 py-3 rounded-xl transition-colors">
+                    1. Clear Session Storage
+                </button>
+                
+                <button onclick="setCorrectCandidateId()" class="w-full bg-yellow/20 hover:bg-yellow/30 text-yellow border border-yellow/30 px-6 py-3 rounded-xl transition-colors">
+                    2. Set Correct Candidate ID
+                </button>
+                
+                <button onclick="testAPI()" class="w-full bg-purple-light/20 hover:bg-purple-light/30 text-purple-light border border-purple-light/30 px-6 py-3 rounded-xl transition-colors">
+                    3. Test API Call
+                </button>
+                
+                <button onclick="goToAnalysisPage()" class="w-full bg-gradient-to-r from-mint to-yellow text-dark font-semibold px-6 py-3 rounded-xl hover:shadow-lg transition-all">
+                    4. Go to Analysis Page
+                </button>
+            </div>
+            
+            <div id="status" class="p-4 bg-dark/30 border border-cream/20 rounded-xl">
+                <p class="text-cream">Ready to fix the analysis display issue...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        const CORRECT_CANDIDATE_ID = "0b07d724-0b19-4805-9d2f-aa0977c8ca92";
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            const colors = {
+                'info': 'text-cream',
+                'success': 'text-mint',
+                'error': 'text-red',
+                'warning': 'text-yellow'
+            };
+            status.innerHTML = `<p class="${colors[type]}">${message}</p>`;
+        }
+        
+        function clearSessionStorage() {
+            // Clear all session storage
+            sessionStorage.clear();
+            
+            // Also clear any localStorage that might interfere
+            localStorage.removeItem('currentCandidateId');
+            localStorage.removeItem('candidateData');
+            localStorage.removeItem('analysisData');
+            
+            updateStatus('✅ Cleared all session and local storage', 'success');
+        }
+        
+        function setCorrectCandidateId() {
+            sessionStorage.setItem('currentCandidateId', CORRECT_CANDIDATE_ID);
+            updateStatus(`✅ Set candidate ID to: ${CORRECT_CANDIDATE_ID}`, 'success');
+        }
+        
+        async function testAPI() {
+            updateStatus('⏳ Testing API call...', 'warning');
+            
+            try {
+                const response = await window.resumifyAPI.getAnalysis(CORRECT_CANDIDATE_ID);
+                
+                if (response.success && response.data) {
+                    const data = response.data;
+                    const isCorrectData = data.extractedText && data.extractedText.includes('Nishith Geedh');
+                    
+                    if (isCorrectData) {
+                        updateStatus(`✅ API returns correct data for Nishith (${data.extractedText.length} chars)`, 'success');
+                    } else {
+                        updateStatus(`❌ API returns wrong data: ${data.extractedText ? data.extractedText.substring(0, 50) + '...' : 'No text'}`, 'error');
+                    }
+                } else {
+                    updateStatus(`❌ API call failed: ${response.error || 'Unknown error'}`, 'error');
+                }
+                
+            } catch (error) {
+                updateStatus(`❌ API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function goToAnalysisPage() {
+            // Clear everything first
+            clearSessionStorage();
+            setCorrectCandidateId();
+            
+            // Navigate with URL parameter to be sure
+            window.location.href = `/analysis.html?candidateId=${CORRECT_CANDIDATE_ID}`;
+        }
+        
+        // Show current session state on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentId = sessionStorage.getItem('currentCandidateId');
+            if (currentId) {
+                updateStatus(`Current session candidate ID: ${currentId}`, currentId === CORRECT_CANDIDATE_ID ? 'success' : 'warning');
+            } else {
+                updateStatus('No candidate ID in session storage', 'warning');
+            }
+        });
+    </script>
+</body>
+</html>

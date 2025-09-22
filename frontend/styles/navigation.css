@@ -1,0 +1,446 @@
+/**
+ * Modern Navigation Styles for Resumify
+ * Clean, modern navigation with proper full-width styling
+ */
+
+/* Navigation Base Styles - Full Width */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+    background: rgba(25, 25, 25, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(218, 165, 255, 0.15);
+    transition: all 0.3s ease;
+    height: 80px;
+    overflow: visible;
+}
+
+/* Navigation Inner Container */
+nav > div {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 100%;
+}
+
+.nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+/* Logo Styles */
+.logo-link {
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    outline: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.logo-link:hover,
+.logo-link:focus {
+    transform: scale(1.02);
+}
+
+.logo-link:hover h1,
+.logo-link:focus h1 {
+    text-shadow: 0 0 20px rgba(78, 196, 254, 0.4);
+}
+
+.logo-link:focus {
+    outline: 2px solid rgba(78, 196, 254, 0.6);
+    outline-offset: 2px;
+}
+
+/* Desktop Navigation */
+.desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+@media (min-width: 768px) {
+    .desktop-nav {
+        display: flex;
+    }
+}
+
+/* Navigation Links - Modern Style */
+.nav-link {
+    position: relative;
+    color: rgba(255, 242, 198, 0.8);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: rgb(78, 196, 254);
+    background: rgba(78, 196, 254, 0.08);
+    transform: translateY(-1px);
+}
+
+.nav-link:focus {
+    outline: 2px solid rgba(78, 196, 254, 0.6);
+    outline-offset: 2px;
+}
+
+/* Active Navigation Link - Color Based */
+.nav-link.active {
+    color: rgb(0, 215, 171) !important; /* mint color */
+    background: linear-gradient(135deg, rgba(0, 215, 171, 0.15), rgba(78, 196, 254, 0.1));
+    font-weight: 600;
+    border: 1px solid rgba(0, 215, 171, 0.3);
+    box-shadow: 0 0 15px rgba(0, 215, 171, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Mobile Menu Button - Modern Style */
+.mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 242, 198);
+    background: rgba(255, 242, 198, 0.05);
+    border: 1px solid rgba(255, 242, 198, 0.15);
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    outline: none;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+.mobile-menu-btn:hover,
+.mobile-menu-btn:focus {
+    color: rgb(78, 196, 254);
+    background: rgba(78, 196, 254, 0.1);
+    border-color: rgba(78, 196, 254, 0.3);
+    transform: translateY(-1px);
+}
+
+.mobile-menu-btn:focus {
+    outline: 2px solid rgba(78, 196, 254, 0.6);
+    outline-offset: 2px;
+}
+
+/* Mobile Navigation Menu - Improved */
+.mobile-nav {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(218, 165, 255, 0.15);
+    background: rgba(25, 25, 25, 0.5);
+    border-radius: 0 0 12px 12px;
+    animation: mobileMenuSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes mobileMenuSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-nav {
+        display: none !important;
+    }
+}
+
+.mobile-nav.show {
+    display: block;
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 1rem;
+}
+
+.mobile-nav .nav-link {
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    margin: 0;
+    min-height: 48px;
+}
+
+.mobile-nav .nav-link.active {
+    background: linear-gradient(135deg, rgba(0, 215, 171, 0.2), rgba(78, 196, 254, 0.1));
+    color: rgb(0, 215, 171);
+    border-left: 4px solid rgb(0, 215, 171);
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 0 15px rgba(0, 215, 171, 0.2);
+}
+
+/* Navigation Accessibility Enhancements */
+.nav-link[aria-current="page"] {
+    color: rgb(255, 242, 198);
+    font-weight: 600;
+}
+
+/* Skip Navigation Link */
+.skip-nav {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: rgb(25, 25, 25);
+    color: rgb(255, 242, 198);
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 2px solid rgb(78, 196, 254);
+    z-index: 100;
+    transition: top 0.3s ease;
+}
+
+.skip-nav:focus {
+    top: 6px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    nav {
+        background: #000000;
+        border-bottom: 2px solid #FFFFFF;
+    }
+    
+    .nav-link {
+        color: #FFFFFF;
+        border: 1px solid transparent;
+    }
+    
+    .nav-link:hover,
+    .nav-link:focus {
+        color: #FFFFFF;
+        background: #333333;
+        border-color: #FFFFFF;
+    }
+    
+    .nav-link.active {
+        background: #333333;
+        border-color: #FFFFFF;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .nav-link,
+    .logo-link,
+    .mobile-menu-btn,
+    nav {
+        transition: none;
+    }
+    
+    .nav-link.active::after {
+        animation: none;
+    }
+    
+    .mobile-nav {
+        animation: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    nav {
+        display: none;
+    }
+}
+
+/* Focus Visible Support */
+.nav-link:focus-visible,
+.logo-link:focus-visible,
+.mobile-menu-btn:focus-visible {
+    outline: 2px solid rgb(78, 196, 254);
+    outline-offset: 2px;
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .nav-link,
+    .mobile-menu-btn {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mobile-nav .nav-link {
+        min-height: 48px;
+        padding: 1rem 0;
+    }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+    nav {
+        background: rgba(25, 25, 25, 0.95);
+        border-bottom-color: rgba(218, 165, 255, 0.3);
+    }
+}
+
+/* Navigation Loading State */
+.nav-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.nav-loading .nav-link {
+    color: rgba(255, 242, 198, 0.5);
+}
+
+/* Responsive Navigation Adjustments */
+@media (max-width: 480px) {
+    nav {
+        height: 70px;
+    }
+    
+    nav > div {
+        padding: 0 1rem;
+    }
+    
+    .logo-link h1 {
+        font-size: 1.75rem;
+    }
+    
+    .logo-link p {
+        font-size: 0.75rem;
+    }
+    
+    .mobile-menu-btn {
+        padding: 0.5rem;
+        min-height: 40px;
+        min-width: 40px;
+    }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 481px) and (max-width: 767px) {
+    .nav-link {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Navigation Animation States */
+.nav-enter {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.nav-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.nav-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nav-exit-active {
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 0.3s ease;
+}
+/* Main Content Adjustments for Fixed Navigation */
+main {
+    padding-top: 80px;
+}
+
+@media (max-width: 480px) {
+    main {
+        padding-top: 70px;
+    }
+}
+
+/* Smooth Scroll Behavior */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+}
+
+/* Navigation Hover Effects Enhancement */
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(78, 196, 254, 0.1), rgba(0, 215, 171, 0.1));
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.nav-link:hover::before {
+    opacity: 1;
+}
+
+/* Logo Gradient Enhancement */
+.logo-link h1 {
+    background: linear-gradient(135deg, rgb(78, 196, 254), rgb(218, 165, 255), rgb(0, 215, 171));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+}
+
+/* Navigation Shadow on Scroll */
+nav.scrolled {
+    background: rgba(25, 25, 25, 0.98);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom-color: rgba(218, 165, 255, 0.3);
+}
+
+/* Modern Glassmorphism Effect */
+nav {
+    background: rgba(25, 25, 25, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Active Link Enhanced Glow Effect */
+.nav-link.active {
+    box-shadow: 0 0 20px rgba(0, 215, 171, 0.3), 0 4px 15px rgba(0, 215, 171, 0.1);
+}

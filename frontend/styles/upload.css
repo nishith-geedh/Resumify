@@ -1,0 +1,476 @@
+/* Upload specific styles */
+
+#fileUploadArea {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px dashed transparent;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+/* Enhanced Modal Styles */
+.modal-overlay {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(218, 165, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced Loading Animations */
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+        backdrop-filter: blur(0px);
+    }
+    to { 
+        opacity: 1; 
+        backdrop-filter: blur(8px);
+    }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-30px) scale(0.9); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+    50% { 
+        opacity: 0.6; 
+        transform: scale(0.9); 
+    }
+}
+
+@keyframes dotPulse {
+    0%, 100% { 
+        opacity: 0.3; 
+        transform: scale(0.8); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.2); 
+    }
+}
+
+@keyframes errorPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 0 0 rgba(242, 78, 50, 0.4);
+    }
+    50% { 
+        transform: scale(1.05); 
+        box-shadow: 0 0 0 10px rgba(242, 78, 50, 0);
+    }
+}
+
+/* Button Styles */
+.btn-modal {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-modal:hover::before {
+    left: 100%;
+}
+
+.btn-modal.btn-primary {
+    background: linear-gradient(135deg, #4EC4FE 0%, #00D7AB 100%);
+    color: #191919;
+    border: none;
+}
+
+.btn-modal.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(78, 196, 254, 0.4);
+    background: linear-gradient(135deg, #5ECAFF 0%, #10E1B5 100%);
+}
+
+.btn-modal.btn-secondary {
+    background: rgba(218, 165, 255, 0.1);
+    border: 1px solid rgba(218, 165, 255, 0.3);
+    color: #DAA5FF;
+    backdrop-filter: blur(10px);
+}
+
+.btn-modal.btn-secondary:hover {
+    background: rgba(218, 165, 255, 0.2);
+    border-color: rgba(218, 165, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(218, 165, 255, 0.2);
+}
+
+/* Scrollbar Styling */
+.text-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.text-container::-webkit-scrollbar-track {
+    background: rgba(25, 25, 25, 0.5);
+    border-radius: 6px;
+    margin: 4px;
+}
+
+.text-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(78, 196, 254, 0.3), rgba(218, 165, 255, 0.3));
+    border-radius: 6px;
+    border: 2px solid rgba(25, 25, 25, 0.5);
+}
+
+.text-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, rgba(78, 196, 254, 0.5), rgba(218, 165, 255, 0.5));
+}
+
+/* Text Selection Styling */
+.extracted-text-content::selection {
+    background: rgba(78, 196, 254, 0.3);
+    color: #FFF2C6;
+}
+
+.extracted-text-content::-moz-selection {
+    background: rgba(78, 196, 254, 0.3);
+    color: #FFF2C6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95vw;
+        max-height: 90vh;
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-modal {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .text-container {
+        max-height: 300px;
+    }
+}
+
+/* Focus Styles for Accessibility */
+.btn-modal:focus {
+    outline: 2px solid #4EC4FE;
+    outline-offset: 2px;
+}
+
+.close-modal:focus {
+    outline: 2px solid #F24E32;
+    outline-offset: 2px;
+}
+
+#fileUploadArea:hover {
+    background: rgba(78, 196, 254, 0.05);
+    border-color: rgba(78, 196, 254, 0.3);
+}
+
+#fileUploadArea.dragover {
+    background: rgba(78, 196, 254, 0.1);
+    border-color: #4EC4FE;
+    transform: scale(1.02);
+}
+
+.upload-link {
+    position: relative;
+}
+
+.upload-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4EC4FE, #00D7AB);
+    transition: width 0.3s ease;
+}
+
+.upload-link:hover::after {
+    width: 100%;
+}
+
+.file-details {
+    animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.remove-file:hover {
+    transform: scale(1.1);
+}
+
+/* Progress bar animation with bounds checking */
+#progressFill {
+    background: linear-gradient(90deg, #4EC4FE, #00D7AB);
+    transition: width 0.5s ease;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%; /* Enforce maximum width constraint */
+    box-sizing: border-box;
+}
+
+/* Progress updating animation */
+#progressFill.progress-updating {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba(78, 196, 254, 0.4);
+}
+
+/* Progress completion animation */
+#progressFill.progress-complete {
+    animation: progressComplete 0.6s ease;
+}
+
+@keyframes progressComplete {
+    0% {
+        box-shadow: 0 0 8px rgba(78, 196, 254, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(78, 196, 254, 0.8);
+        transform: scaleY(1.1);
+    }
+    100% {
+        box-shadow: 0 0 8px rgba(78, 196, 254, 0.4);
+        transform: scaleY(1);
+    }
+}
+
+/* Enhanced indeterminate progress animation */
+#progressFill.indeterminate-progress {
+    background: linear-gradient(90deg, 
+        rgba(78, 196, 254, 0.2) 0%, 
+        rgba(78, 196, 254, 0.6) 15%,
+        #4EC4FE 30%, 
+        #00D7AB 50%, 
+        #4EC4FE 70%,
+        rgba(78, 196, 254, 0.6) 85%,
+        rgba(78, 196, 254, 0.2) 100%
+    );
+    background-size: 300% 100%;
+    animation: indeterminateSlide 2.5s ease-in-out infinite;
+    max-width: 100%; /* Prevent overflow */
+}
+
+/* Pulsing effect for long-running DOC file processing */
+#progressFill.indeterminate-pulse {
+    animation: indeterminateSlide 2.5s ease-in-out infinite, 
+               indeterminatePulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes indeterminateSlide {
+    0% {
+        background-position: -300% 0;
+    }
+    100% {
+        background-position: 300% 0;
+    }
+}
+
+@keyframes indeterminatePulse {
+    0% {
+        opacity: 0.8;
+        box-shadow: 0 0 5px rgba(78, 196, 254, 0.3);
+    }
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(78, 196, 254, 0.6);
+    }
+}
+
+/* Progress bar accessibility and visual enhancements */
+.progress-container {
+    border-radius: 0.5rem;
+    background: rgba(25, 25, 25, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.progress-container:focus-within {
+    outline: 2px solid rgba(78, 196, 254, 0.5);
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all progress states */
+#progressFill {
+    border-radius: 0.5rem;
+    will-change: width, background-position;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    #progressFill {
+        background: linear-gradient(90deg, #ffffff, #00ff00);
+    }
+    
+    #progressFill.indeterminate-progress {
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 0.3) 0%, 
+            #ffffff 30%, 
+            #00ff00 50%, 
+            #ffffff 70%,
+            rgba(255, 255, 255, 0.3) 100%
+        );
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    #progressFill {
+        transition: width 0.2s ease;
+    }
+    
+    #progressFill.indeterminate-progress {
+        animation: none;
+        background: linear-gradient(90deg, #4EC4FE, #00D7AB);
+    }
+    
+    #progressFill.indeterminate-pulse {
+        animation: none;
+    }
+    
+    #progressFill.progress-updating {
+        transition: width 0.1s ease;
+    }
+}
+
+/* Enhanced progress container with bounds checking */
+.progress-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure progress fill never exceeds container */
+.progress-container #progressFill {
+    max-width: 100%;
+    width: 0%;
+    min-width: 0;
+}
+
+.progress-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        transparent 100%
+    );
+    transform: translateX(-100%);
+    animation: progressShimmer 3s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Upload status animations */
+.upload-status {
+    animation: fadeInScale 0.5s ease;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Success state */
+.success-state {
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Error state */
+.upload-error {
+    animation: errorShake 0.5s ease;
+}
+
+@keyframes errorShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
